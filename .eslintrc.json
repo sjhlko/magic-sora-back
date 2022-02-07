@@ -19,6 +19,7 @@
       { "singleQuote": true, "parser": "flow", "endOfLine": "auto" }
     ],
     "no-console": "off",
-    "no-unused-vars": "warn"
+    "no-unused-vars": "warn",
+    "import/extensions": "ignorePackages"
   }
 }
