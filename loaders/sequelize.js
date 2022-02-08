@@ -1,10 +1,9 @@
-import sequelize from '../models/index.js';
+import db from '../models/index.js';
 
 export default async () => {
-  const db = await sequelize();
-
   try {
-    await db.sync({ force: false });
+    // SQL DB 연결
+    await db.sequelize.sync({ force: false });
     console.log('Connecting database success!');
   } catch (error) {
     console.error('Connecting database fail!', error);
