@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>main</title>
+        <meta charset = 'utf-8'>
+    </head>
+    <body>
+        <form method="post">
+            <table>
+                <tr>
+                    <td>
+                        <select name="option">
+                            <option value="post_title">글제목</option>
+                            <option value="post_content">글내용</option>
+                            <option value="user_id">작성자</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" name="searchEngine">
+                    </td>
+                    <td>
+                        <input type="submit" name="button">
+                        <!--submit 버튼을 누르면 쿼리스트링으로 search (body로 선택x)-->
+                    </td>
+                </tr>
+            </table>
+        </form>
+
+    </body>
+</html>
