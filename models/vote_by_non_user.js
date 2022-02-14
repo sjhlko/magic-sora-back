@@ -1,11 +1,6 @@
 import { Model, DataTypes } from 'sequelize';
-import db from './index.js';
-
-const sequelize = db.sequelize;
-
-export class VoteByNonUser extends Model {
-  static associate(models) {}
-}
+import { sequelize } from './index.js';
+export class VoteByNonUser extends Model {}
 
 VoteByNonUser.init(
   {
@@ -30,6 +25,11 @@ VoteByNonUser.init(
     choice_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      primaryKey: true,
+      references: {
+        model: 'choice',
+        key: 'choice_id',
+      },
     },
   },
   {

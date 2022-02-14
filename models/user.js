@@ -1,11 +1,27 @@
 import { Model, DataTypes } from 'sequelize';
-import db from './index.js';
-
-const sequelize = db.sequelize;
-
+import { sequelize } from './index.js';
 export class User extends Model {
   // model 간의 관계를 정의하는 함수 (다른 모델들도 모두 동일)
-  static assosiate(models) {}
+  static async associate(models) {
+    this.hasMany(models.Post, { foreignKey: 'user_id', sourceKey: 'user_id' });
+    this.hasMany(models.Comment, {
+      foreignKey: 'user_id',
+      sourceKey: 'user_id',
+    });
+
+    this.belongsToMany(models.Tag, {
+      through: models.InterestedTag,
+      foreignKey: 'user_id',
+    });
+    this.belongsToMany(models.Comment, {
+      through: models.LikeByUser,
+      foreignKey: 'user_id',
+    });
+    this.belongsToMany(models.Post, {
+      through: models.VoteByUser,
+      foreignKey: 'user_id',
+    });
+  }
 }
 
 User.init(

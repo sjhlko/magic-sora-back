@@ -1,10 +1,12 @@
 import { Model, DataTypes } from 'sequelize';
-import db from './index.js';
-
-const sequelize = db.sequelize;
-
+import { sequelize } from './index.js';
 export class Choice extends Model {
-  static associate(models) {}
+  static async associate(models) {
+    this.belongsTo(models.Post, {
+      foreignKey: 'post_id',
+      targetKey: 'post_id',
+    });
+  }
 }
 
 Choice.init(

@@ -1,10 +1,25 @@
 import { Model, DataTypes } from 'sequelize';
-import db from './index.js';
-
-const sequelize = db.sequelize;
-
+import { sequelize } from './index.js';
 export class Comment extends Model {
-  static associate(models) {}
+  static async associate(models) {
+    this.belongsToMany(models.User, {
+      through: models.LikeByUser,
+      foreignKey: 'comment_id',
+    });
+    this.belongsToMany(models.NonUser, {
+      through: models.LikeByNonUser,
+      foreignKey: 'comment_id',
+    });
+
+    this.belongsTo(models.Post, {
+      foreignKey: 'post_id',
+      targetKey: 'post_id',
+    });
+    this.belongsTo(models.User, {
+      foreignKey: 'user_id',
+      targetKey: 'user_id',
+    });
+  }
 }
 
 Comment.init(
