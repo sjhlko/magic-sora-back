@@ -1,11 +1,7 @@
 import { Model, DataTypes } from 'sequelize';
-import db from './index.js';
+import { sequelize } from './index.js';
 
-const sequelize = db.sequelize;
-
-export class InterestedTag extends Model {
-  static associate(models) {}
-}
+export class InterestedTag extends Model {}
 
 InterestedTag.init(
   {

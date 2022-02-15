@@ -1,10 +1,16 @@
 import { Model, DataTypes } from 'sequelize';
-import db from './index.js';
-
-const sequelize = db.sequelize;
-
+import { sequelize } from './index.js';
 export class NonUser extends Model {
-  static associate() {}
+  static async associate(models) {
+    this.belongsToMany(models.Comment, {
+      through: models.LikeByNonUser,
+      foreignKey: 'non_user_id',
+    });
+    this.belongsToMany(models.Choice, {
+      through: models.VoteByNonUser,
+      foreignKey: 'non_user_id',
+    });
+  }
 }
 
 NonUser.init(

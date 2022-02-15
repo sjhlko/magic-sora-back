@@ -1,10 +1,16 @@
 import { Model, DataTypes } from 'sequelize';
-import db from './index.js';
-
-const sequelize = db.sequelize;
-
+import { sequelize } from './index.js';
 export class Tag extends Model {
-  static associate(models) {}
+  static async associate(models) {
+    this.belongsToMany(models.Post, {
+      through: models.TagOfPost,
+      foreignKey: 'tag_id',
+    });
+    this.belongsToMany(models.User, {
+      through: models.InterestedTag,
+      foreignKey: 'tag_id',
+    });
+  }
 }
 
 Tag.init(

@@ -1,10 +1,34 @@
 import { Model, DataTypes } from 'sequelize';
-import db from './index.js';
-
-const sequelize = db.sequelize;
-
+import { sequelize } from './index.js';
 export class Post extends Model {
-  static associate(models) {}
+  static async associate(models) {
+    this.hasMany(models.Choice, {
+      foreignKey: 'post_id',
+      sourceKey: 'post_id',
+    });
+    this.hasMany(models.Comment, {
+      foreignKey: 'post_id',
+      sourceKey: 'post_id',
+    });
+
+    this.belongsTo(models.User, {
+      foreignKey: 'user_id',
+      targetKey: 'user_id',
+    });
+
+    this.belongsToMany(models.User, {
+      through: models.VoteByUser,
+      foreignKey: 'post_id',
+    });
+    this.belongsToMany(models.NonUser, {
+      through: models.VoteByNonUser,
+      foreignKey: 'post_id',
+    });
+    this.belongsToMany(models.Tag, {
+      through: models.TagOfPost,
+      foreignKey: 'post_id',
+    });
+  }
 }
 
 Post.init(
