@@ -98,12 +98,14 @@ export default app => {
 
   // 투표한 고민 조회
   route.get('/:id/myvotes', async (req, res) => {
+    const id = req.params.id;
     const user = await models.User.findOne({
+      where: { user_id: id },
       include: [
         {
           model: models.Post,
           through: {
-            where: { user_id: req.params.id },
+            where: { user_id: id },
           },
         },
       ],
@@ -111,17 +113,19 @@ export default app => {
     const votePosts = user.Posts;
 
     console.log('api success!: myposts', JSON.stringify(votePosts, null, 2));
-    res.json(votePosts);
+    return res.json(votePosts);
   });
 
   // 관심태그 조회
   route.get('/:id/mytags', async (req, res) => {
+    const id = req.params.id;
     const user = await models.User.findOne({
+      where: { user_id: id },
       include: [
         {
           model: models.Tag,
           through: {
-            where: { user_id: req.params.id },
+            where: { user_id: id },
           },
         },
       ],
