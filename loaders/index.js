@@ -3,5 +3,5 @@ import expressLoader from './express.js';
 
 export default async expressApp => {
   await sequelizeLoader();
-  await expressLoader(expressApp);
+  expressLoader(expressApp);
 };

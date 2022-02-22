@@ -208,33 +208,20 @@ export default app => {
   });
 
   // 관심태그 추가
-  route.post('/:id/mytags/:tagId', async (req, res) => {
+  route.post('/:id/mytags', async (req, res) => {
     const userId = req.params.id;
-    const tagId = req.params.tagId;
+    const tagId = req.body.tagId;
     const tag = await models.Tag.findOne({
+      attributes: ['tag_id'],
       where: { tag_id: tagId },
     });
     const user = await models.User.findOne({
+      attributes: ['user_id'],
       where: { user_id: userId },
     });
 
     await user.addTag(tag);
-    const userTag = await models.User.findOne({
-      include: [
-        {
-          model: models.Tag,
-          through: {
-            where: { user_id: userId },
-          },
-        },
-      ],
-    });
-
-    console.log(
-      'api success!: myvote add',
-      JSON.stringify(userTag.Tags, null, 2),
-    );
-    return res.json(userTag.Tags);
+    return res.sendStatus(201);
   });
 
   // 관심태그 삭제
