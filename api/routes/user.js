@@ -53,27 +53,13 @@ export default app => {
 
   // 프로필 정보 수정
   route.patch('/:id', async (req, res) => {
-    const id = req.params.id;
-    const user = req.body.user;
-    user = await models.User.update(
-      {
-        password: user.password,
-        nickname: user.nickname,
-        birth_date: user.birthDate,
-        gender: user.gender,
-        mbti: user.mbti,
-        profile_pic_url: user.profileURL,
-      },
-      {
-        where: { user_id: id },
-      },
-    );
-    user = await models.User.findOne({
-      where: { user_id: id },
+    const newUser = req.body;
+    const user = await models.User.findOne({
+      where: { user_id: req.params.id },
     });
+    await user.update(newUser);
 
-    console.log('api success!: user update', JSON.stringify(user, null, 2));
-    return res.json(user);
+    return res.sendStatus(200);
   });
 
   // 회원 탈퇴
@@ -200,11 +186,11 @@ export default app => {
       ],
     });
 
-    console.log('api success!: mytags', JSON.stringify(user, null, 2));
-    const userTag = user.Tags;
-
-    console.log('api success!: mytags', JSON.stringify(userTag, null, 2));
-    return res.json(userTag);
+    console.log(
+      'api success!: user mytags',
+      JSON.stringify(user.Tags, null, 2),
+    );
+    return res.json(user.Tags);
   });
 
   // 관심태그 추가
