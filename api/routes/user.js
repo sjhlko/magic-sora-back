@@ -133,18 +133,55 @@ export default app => {
     const id = req.params.id;
     const user = await models.User.findOne({
       where: { user_id: id },
+      attributes: ['user_id'],
       include: [
         {
           model: models.Post,
+          attributes: ['post_id', 'user_id', 'post_title', 'register_date'],
           through: {
             where: { user_id: id },
           },
         },
       ],
     });
-    const votePosts = user.Posts;
+    let votePosts = user.Posts;
 
-    console.log('api success!: myposts', JSON.stringify(votePosts, null, 2));
+    votePosts = votePosts.map(async value => {
+      let post = {
+        postId: value.post_id,
+        title: value.post_title,
+        registerDate: value.register_date,
+      };
+
+      const author = await models.User.findOne({
+        where: { user_id: value.user_id },
+        attributes: ['nickname'],
+      });
+      post.author = author.nickname;
+
+      const tag = await value.getTags({
+        attributes: ['tag_name'],
+      });
+      post.tags = tag.map(value => {
+        return value.tag_name;
+      });
+
+      const thumbnail = await value.getChoices({
+        attributes: ['photo_url'],
+        limit: 1,
+      });
+      post.thumbnail = thumbnail[0].photo_url;
+
+      const comments = await models.Comment.count({
+        where: { post_id: value.post_id },
+      });
+      post.commentNum = comments;
+
+      return post;
+    });
+    votePosts = await Promise.all(votePosts);
+
+    console.log('api success!: user votes', votePosts);
     return res.json(votePosts);
   });
 
