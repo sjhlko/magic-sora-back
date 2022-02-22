@@ -89,10 +89,42 @@ export default app => {
   route.get('/:id/myposts', async (req, res) => {
     const user = await models.User.findOne({
       where: { user_id: req.params.id },
+      attributes: ['user_id', 'nickname'],
     });
-    const userPosts = await user.getPosts();
+    let userPosts = await user.getPosts({
+      attributes: ['post_id', 'post_title', 'register_date'],
+    });
 
-    console.log('api success!: myposts', JSON.stringify(userPosts, null, 2));
+    userPosts = userPosts.map(async value => {
+      let post = {
+        postId: value.post_id,
+        title: value.post_title,
+        registerDate: value.register_date,
+        author: user.nickname,
+      };
+      const tag = await value.getTags({
+        attributes: ['tag_name'],
+      });
+      post.tags = tag.map(value => {
+        return value.tag_name;
+      });
+
+      const thumbnail = await value.getChoices({
+        attributes: ['photo_url'],
+        limit: 1,
+      });
+      post.thumbnail = thumbnail[0].photo_url;
+
+      const comments = await models.Comment.count({
+        where: { post_id: value.post_id },
+      });
+      post.commentNum = comments;
+
+      return post;
+    });
+    userPosts = await Promise.all(userPosts);
+
+    console.log('api success!: user posts', userPosts);
     return res.json(userPosts);
   });
 
