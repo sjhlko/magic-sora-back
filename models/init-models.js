@@ -26,13 +26,13 @@ const models = {
   VoteByNonUser: VoteByNonUser,
 };
 
-async function associate() {
-  await User.associate(models);
-  await NonUser.associate(models);
-  await Post.associate(models);
-  await Choice.associate(models);
-  await Comment.associate(models);
-  await Tag.associate(models);
+function associate() {
+  User.associate(models);
+  NonUser.associate(models);
+  Post.associate(models);
+  Choice.associate(models);
+  Comment.associate(models);
+  Tag.associate(models);
 }
 
 export { models, associate };
