@@ -1,7 +1,7 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from './index.js';
 export class Tag extends Model {
-  static async associate(models) {
+  static associate(models) {
     this.belongsToMany(models.Post, {
       through: models.TagOfPost,
       foreignKey: 'tag_id',

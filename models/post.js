@@ -1,7 +1,7 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from './index.js';
 export class Post extends Model {
-  static async associate(models) {
+  static associate(models) {
     this.hasMany(models.Choice, {
       foreignKey: 'post_id',
       sourceKey: 'post_id',

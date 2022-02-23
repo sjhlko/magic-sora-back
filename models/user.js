@@ -2,7 +2,7 @@ import { Model, DataTypes } from 'sequelize';
 import { sequelize } from './index.js';
 export class User extends Model {
   // model 간의 관계를 정의하는 함수 (다른 모델들도 모두 동일)
-  static async associate(models) {
+  static associate(models) {
     this.hasMany(models.Post, { foreignKey: 'user_id', sourceKey: 'user_id' });
     this.hasMany(models.Comment, {
       foreignKey: 'user_id',

@@ -1,7 +1,7 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from './index.js';
 export class NonUser extends Model {
-  static async associate(models) {
+  static associate(models) {
     this.belongsToMany(models.Comment, {
       through: models.LikeByNonUser,
       foreignKey: 'non_user_id',
