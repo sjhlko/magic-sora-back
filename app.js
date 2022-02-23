@@ -5,11 +5,7 @@ import loaders from './loaders/index.js';
 async function startServer() {
   const app = express();
 
-  loaders(app);
-
-  app.get('/', (req, res) => {
-    res.send('마법의 익명고동');
-  });
+  await loaders(app);
 
   app
     .listen(config.port, () => {
