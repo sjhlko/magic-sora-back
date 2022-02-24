@@ -1,5 +1,7 @@
 import { Router } from 'express';
+import config from '../../config/index.js';
 import { models } from '../../models/init-models.js';
+import { transporter } from '../../util/mailer.js';
 const route = Router();
 
 export default app => {
@@ -13,6 +15,24 @@ export default app => {
 
     console.log('api success!: user profile', JSON.stringify(user, null, 2));
     return res.json(user);
+  });
+
+  route.get('/:id/password', async (req, res) => {
+    const user = await models.User.findOne({
+      where: { user_id: req.params.id },
+      attributes: ['user_email'],
+    });
+
+    console.log('user email: ', user.user_email);
+
+    await transporter.sendMail({
+      from: `'Magic Soragodong' <${config.mailerUser}>`,
+      to: user.user_email,
+      subject: '🔮 마법의 익명고동 비밀번호 찾기',
+      text: '비밀번호 찾기',
+    });
+
+    return res.sendStatus(200);
   });
 
   // email, 닉네임 중복 조회
