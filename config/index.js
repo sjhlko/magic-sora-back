@@ -16,6 +16,12 @@ export default {
   databaseURL: process.env.SQL_URI,
 
   /**
+   * node mailer
+   */
+  mailerUser: process.env.NODEMAILER_USER,
+  mailerPW: process.env.NODEMAILER_PW,
+
+  /**
    * api config
    */
   api: {
