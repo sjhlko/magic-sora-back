@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import config from '../../config/index.js';
 import { models } from '../../models/init-models.js';
-import { transporter } from '../../util/mailer.js';
+import config from '../../config/index.js';
+import transporter from '../../util/mailer.js';
 const route = Router();
 
 export default app => {

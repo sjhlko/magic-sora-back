@@ -1,5 +1,5 @@
 import { Model, DataTypes } from 'sequelize';
-import { sequelize } from './index.js';
+import sequelize from './index.js';
 export class Post extends Model {
   static associate(models) {
     this.hasMany(models.Choice, {

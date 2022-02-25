@@ -1,5 +1,5 @@
 import { Model, DataTypes } from 'sequelize';
-import { sequelize } from './index.js';
+import sequelize from './index.js';
 export class User extends Model {
   // model 간의 관계를 정의하는 함수 (다른 모델들도 모두 동일)
   static associate(models) {
