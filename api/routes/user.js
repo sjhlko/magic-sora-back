@@ -15,11 +15,7 @@ export default app => {
         where: { user_id: req.params.id },
       });
 
-      return res.json({
-        status: 200,
-        message: 'User found',
-        user: user,
-      });
+      return res.json(user);
     } catch (err) {
       return next(err);
     }
@@ -42,10 +38,7 @@ export default app => {
           text: '비밀번호 찾기',
         });
 
-        return res.json({
-          status: 200,
-          message: 'Email for new password sent',
-        });
+        return res.sendStatus(200);
       } catch (err) {
         next(err);
       }
@@ -53,38 +46,43 @@ export default app => {
   );
 
   // email, 닉네임 중복 조회
-  route.get('/:id/exists', async (req, res) => {
-    const type = req.query.type;
-    const check = req.query.check;
-
-    if (type == 'email') {
+  route.get('/:id/nickname-exists', async (req, res, next) => {
+    try {
       const user = await models.User.findOne({
-        where: { user_email: check },
+        where: { nickname: req.query.check },
       });
+
       if (user) {
         return res.json({
           isExists: true,
         });
-      } else {
-        return res.json({
-          isExists: false,
-        });
       }
+
+      return res.json({
+        isExists: false,
+      });
+    } catch (err) {
+      return next(err);
     }
+  });
 
-    if (type == 'nickName') {
+  route.get('/:id/email-exists', async (req, res, next) => {
+    try {
       const user = await models.User.findOne({
-        where: { nickname: check },
+        where: { user_email: req.query.check },
       });
+
       if (user) {
         return res.json({
           isExists: true,
         });
-      } else {
-        return res.json({
-          isExists: false,
-        });
       }
+
+      return res.json({
+        isExists: false,
+      });
+    } catch (err) {
+      next(err);
     }
   });
 
@@ -97,10 +95,7 @@ export default app => {
       });
       await user.update(newUser);
 
-      return res.json({
-        status: 200,
-        message: 'User info patched',
-      });
+      return res.json(user);
     } catch (err) {
       next(err);
     }
@@ -113,10 +108,7 @@ export default app => {
         where: { user_id: req.params.id },
       });
 
-      return res.json({
-        status: 204,
-        message: 'User deleted',
-      });
+      return res.sendStatus(204);
     } catch (err) {
       next(err);
     }
@@ -165,11 +157,7 @@ export default app => {
         });
         userPosts = await Promise.all(userPosts);
 
-        return res.json({
-          status: 200,
-          message: 'User post found',
-          userPosts: userPosts,
-        });
+        return res.json(userPosts);
       } catch (err) {
         next(err);
       }
@@ -233,11 +221,7 @@ export default app => {
         });
         votePosts = await Promise.all(votePosts);
 
-        return res.json({
-          status: 200,
-          message: 'User vote post found',
-          votePosts: votePosts,
-        });
+        return res.json(votePosts);
       } catch (err) {
         next(err);
       }
@@ -263,11 +247,7 @@ export default app => {
           ],
         });
 
-        return res.json({
-          status: 200,
-          message: 'User interest tag found',
-          userTags: user.Tags,
-        });
+        return res.json(user.Tags);
       } catch (err) {
         next(err);
       }
@@ -292,10 +272,7 @@ export default app => {
         });
 
         await user.addTag(tag);
-        return res.json({
-          status: 201,
-          message: 'User interest tag added',
-        });
+        return res.status(201).json({ user_id: userId, tag_id: tagId });
       } catch (err) {
         next(err);
       }
@@ -312,10 +289,7 @@ export default app => {
           where: [{ user_id: req.params.id }, { tag_id: req.params.tagId }],
         });
 
-        return res.json({
-          status: 204,
-          message: 'User interest tag deleted',
-        });
+        return res.sendStatus(204);
       } catch (err) {
         next(err);
       }

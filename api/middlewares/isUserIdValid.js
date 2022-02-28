@@ -9,10 +9,7 @@ const isUserIdValid = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.json({
-        status: 404,
-        message: 'User not found',
-      });
+      return res.status(404).send('User Not Found');
     }
     return next();
   } catch (err) {
