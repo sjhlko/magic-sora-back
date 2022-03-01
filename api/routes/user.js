@@ -46,60 +46,53 @@ export default app => {
   );
 
   // email, 닉네임 중복 조회
-  route.get('/:id/nickname-exists', async (req, res, next) => {
-    try {
-      const user = await models.User.findOne({
-        where: { nickname: req.query.check },
-      });
-
-      if (user) {
+  route.get(
+    '/:id/nickname-exists',
+    middlewares.isNicknameExists,
+    async (req, res, next) => {
+      try {
         return res.json({
-          isExists: true,
+          isExists: false,
         });
+      } catch (err) {
+        return next(err);
       }
+    },
+  );
 
-      return res.json({
-        isExists: false,
-      });
-    } catch (err) {
-      return next(err);
-    }
-  });
-
-  route.get('/:id/email-exists', async (req, res, next) => {
-    try {
-      const user = await models.User.findOne({
-        where: { user_email: req.query.check },
-      });
-
-      if (user) {
+  route.get(
+    '/:id/email-exists',
+    middlewares.isEmailExists,
+    async (req, res, next) => {
+      try {
         return res.json({
-          isExists: true,
+          isExists: false,
         });
+      } catch (err) {
+        next(err);
       }
-
-      return res.json({
-        isExists: false,
-      });
-    } catch (err) {
-      next(err);
-    }
-  });
+    },
+  );
 
   // 프로필 정보 수정
-  route.patch('/:id', middlewares.isUserIdValid, async (req, res) => {
-    try {
-      const newUser = req.body;
-      const user = await models.User.findOne({
-        where: { user_id: req.params.id },
-      });
-      await user.update(newUser);
+  route.patch(
+    '/:id',
+    middlewares.isUserIdValid,
+    middlewares.isNicknameExists,
+    async (req, res, next) => {
+      try {
+        const newUser = req.body;
+        const user = await models.User.findOne({
+          where: { user_id: req.params.id },
+        });
+        await user.update(newUser);
 
-      return res.json(user);
-    } catch (err) {
-      next(err);
-    }
-  });
+        return res.json(user);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
 
   // 회원 탈퇴
   route.delete('/:id', middlewares.isUserIdValid, async (req, res, next) => {
