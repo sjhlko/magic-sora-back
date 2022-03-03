@@ -5,5 +5,6 @@ import config from '../config/index.js';
 export default app => {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
+  app.user(cors());
   app.use(config.api.prefix, route());
 };
