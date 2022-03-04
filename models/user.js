@@ -22,6 +22,49 @@ export class User extends Model {
       foreignKey: 'user_id',
     });
   }
+
+  static async findById(id) {
+    return await this.findOne({
+      where: { user_id: id },
+    });
+  }
+
+  static async updateUser(id, newUser) {
+    const user = await this.findOne({
+      where: { user_id: id },
+    });
+    await user.update(newUser);
+    return user;
+  }
+
+  static async deleteUser(id) {
+    await this.destroy({
+      where: { user_id: id },
+    });
+  }
+
+  static async findWithAttribute(id, attributes) {
+    return await this.findOne({
+      where: { user_id: id },
+      attributes: attributes,
+    });
+  }
+
+  static async findWithModel(id, model, attributes) {
+    await this.findOne({
+      where: { user_id: id },
+      attributes: ['user_id'],
+      include: [
+        {
+          model: model,
+          attributes: attributes,
+          through: {
+            where: { user_id: id },
+          },
+        },
+      ],
+    });
+  }
 }
 
 User.init(

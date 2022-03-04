@@ -6,23 +6,15 @@ export class UserService {
   constructor() {}
 
   async getUserById(id) {
-    return await models.User.findOne({
-      where: { user_id: id },
-    });
+    return await models.User.findById(id);
   }
 
-  async updateUser(id, newUser) {
-    const user = await models.User.findOne({
-      where: { user_id: id },
-    });
-    await user.update(newUser);
-    return user;
+  async updateUser(id, user) {
+    return await models.User.updateUser(id, user);
   }
 
   async deleteUser(id) {
-    await models.User.destroy({
-      where: { user_id: id },
-    });
+    await models.User.deleteUser(id);
 
     // 관심 태그 삭제
     await models.InterestedTag.destroy({
@@ -35,10 +27,7 @@ export class UserService {
   }
 
   async sendPasswordChangeEmail(id) {
-    const user = await models.User.findOne({
-      where: { user_id: id },
-      attributes: ['user_email'],
-    });
+    const user = await models.User.findWithAttribute(id, ['user_email']);
 
     await transporter.sendMail({
       from: `'Magic Soragodong' <${config.mailerUser}>`,
@@ -49,10 +38,10 @@ export class UserService {
   }
 
   async getUserPost(id) {
-    const user = await models.User.findOne({
-      where: { user_id: id },
-      attributes: ['user_id', 'nickname'],
-    });
+    const user = await models.User.findWithAttribute(id, [
+      'user_id',
+      'nickname',
+    ]);
     let userPosts = await user.getPosts({
       attributes: ['post_id', 'post_title', 'register_date'],
     });
@@ -62,9 +51,8 @@ export class UserService {
         postId: post.post_id,
         title: post.post_title,
         registerDate: post.register_date,
+        author: user.nickname,
       };
-
-      userPost.author = user.nickname;
 
       const tags = await post.getTags({
         attributes: ['tag_name'],
@@ -92,33 +80,23 @@ export class UserService {
   }
 
   async getVotePost(id) {
-    const user = await models.User.findOne({
-      where: { user_id: id },
-      attributes: ['user_id'],
-      include: [
-        {
-          model: models.Post,
-          attributes: ['post_id', 'user_id', 'post_title', 'register_date'],
-          through: {
-            where: { user_id: id },
-          },
-        },
-      ],
-    });
+    const user = await models.User.findWithModel(id, models.Post, [
+      'post_id',
+      'user_id',
+      'post_title',
+      'register_date',
+    ]);
     let votePosts = user.Posts;
 
     votePosts = votePosts.map(async post => {
+      const author = await models.User.findWithAttribute(id, ['nickname']);
+
       let votePost = {
         postId: post.post_id,
         title: post.post_title,
         registerDate: post.register_date,
+        author: author.nickname,
       };
-
-      const author = await models.User.findOne({
-        where: { user_id: post.user_id },
-        attributes: ['nickname'],
-      });
-      votePost.author = author.nickname;
 
       const tags = await post.getTags({
         attributes: ['tag_name'],
@@ -146,17 +124,10 @@ export class UserService {
   }
 
   async getUserTag(id) {
-    const user = await models.User.findOne({
-      where: { user_id: id },
-      include: [
-        {
-          model: models.Tag,
-          through: {
-            where: { user_id: id },
-          },
-        },
-      ],
-    });
+    const user = await models.User.findWithModel(id, models.Tag, [
+      'tag_id',
+      'tag_name',
+    ]);
 
     return user.Tags;
   }
@@ -168,10 +139,7 @@ export class UserService {
    * @todo 수정할 태그 리스트 받아서 한 번에 수정
    */
   async addUserTag(userId, tagId) {
-    const user = await models.User.findOne({
-      attributes: ['user_id'],
-      where: { user_id: userId },
-    });
+    const user = await models.User.findWithAttribute(userId, ['user_id']);
     const tag = await models.Tag.findOne({
       attributes: ['tag_id'],
       where: { tag_id: tagId },
