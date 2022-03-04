@@ -161,6 +161,12 @@ export class UserService {
     return user.Tags;
   }
 
+  /**
+   *
+   * @param {*} userId
+   * @param {*} tagId
+   * @todo 수정할 태그 리스트 받아서 한 번에 수정
+   */
   async addUserTag(userId, tagId) {
     const user = await models.User.findOne({
       attributes: ['user_id'],
