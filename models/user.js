@@ -61,7 +61,7 @@ export class User extends Model {
   }
 
   static async findWithModel(id, model, attributes) {
-    await this.findOne({
+    return await this.findOne({
       where: { user_id: id },
       attributes: ['user_id'],
       include: [

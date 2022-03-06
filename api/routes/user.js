@@ -148,7 +148,7 @@ export default app => {
     async (req, res, next) => {
       try {
         const userId = req.params.id;
-        const tagId = req.body.tagId;
+        const tagId = req.body;
         await userServiceInstance.addUserTag(userId, tagId);
 
         return res.status(201).json({ user_id: userId, tag_id: tagId });
@@ -160,12 +160,12 @@ export default app => {
 
   // 관심태그 삭제
   route.delete(
-    '/:id/mytags/:tagId',
+    '/:id/mytags',
     middlewares.isUserIdValid,
     async (req, res, next) => {
       try {
         const userId = req.params.id;
-        const tagId = req.params.tagId;
+        const tagId = req.body;
         await userServiceInstance.deleteUserTag(userId, tagId);
 
         return res.sendStatus(204);

@@ -132,25 +132,24 @@ export class UserService {
     return user.Tags;
   }
 
-  /**
-   *
-   * @param {*} userId
-   * @param {*} tagId
-   * @todo 수정할 태그 리스트 받아서 한 번에 수정
-   */
   async addUserTag(userId, tagId) {
     const user = await models.User.findWithAttribute(userId, ['user_id']);
-    const tag = await models.Tag.findOne({
-      attributes: ['tag_id'],
-      where: { tag_id: tagId },
+    let tags = tagId.map(async tag => {
+      return await models.Tag.findOne({
+        attributes: ['tag_id'],
+        where: { tag_id: tag.tagId },
+      });
     });
+    tags = await Promise.all(tags);
 
-    await user.addTag(tag);
+    await user.addTags(tags);
   }
 
   async deleteUserTag(userId, tagId) {
-    await models.InterestedTag.destroy({
-      where: [{ user_id: userId }, { tag_id: tagId }],
+    tagId.forEach(async tag => {
+      await models.InterestedTag.destroy({
+        where: [{ user_id: userId }, { tag_id: tag.tagId }],
+      });
     });
   }
 }
