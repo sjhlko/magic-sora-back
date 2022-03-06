@@ -1,5 +1,5 @@
 import config from '../config/index.js';
-import transporter from '../library/mailer.js';
+import createTransporter from '../library/mailer.js';
 import { models } from '../models/init-models.js';
 
 export class UserService {
@@ -28,9 +28,10 @@ export class UserService {
 
   async sendPasswordChangeEmail(id) {
     const user = await models.User.findWithAttribute(id, ['user_email']);
+    const transporter = await createTransporter();
 
     await transporter.sendMail({
-      from: `'Magic Soragodong' <${config.mailerUser}>`,
+      from: `'Magic Soragodong' <${config.oauthUser}>`,
       to: user.user_email,
       subject: '🔮 마법의 익명고동 비밀번호 찾기',
       text: '비밀번호 찾기',
