@@ -27,13 +27,9 @@ export class UserService {
     await models.User.deleteUser(id);
 
     // 관심 태그 삭제
-    await models.InterestedTag.destroy({
-      where: { user_id: id },
-    });
+    await models.InterestedTag.deleteAllTags(id);
     // 댓글 좋아요 삭제
-    await models.LikeByUser.destroy({
-      where: { user_id: id },
-    });
+    await models.LikeByUser.deleteAllLikes(id);
   }
 
   async sendPasswordChangeEmail(id) {
@@ -50,37 +46,10 @@ export class UserService {
 
   async getUserPost(id) {
     const user = await models.User.findById(id, ['user_id', 'nickname']);
-    let userPosts = await user.getPosts({
-      attributes: ['post_id', 'post_title', 'register_date'],
-    });
+    let userPosts = await user.getMyPosts();
 
     userPosts = userPosts.map(async post => {
-      let userPost = {
-        postId: post.post_id,
-        title: post.post_title,
-        registerDate: post.register_date,
-        author: user.nickname,
-      };
-
-      const tags = await post.getTags({
-        attributes: ['tag_name'],
-      });
-      userPost.tags = tags.map(tag => {
-        return tag.tag_name;
-      });
-
-      const thumbnail = await post.getChoices({
-        attributes: ['photo_url'],
-        limit: 1,
-      });
-      userPost.thumbnail = thumbnail[0].photo_url;
-
-      const comments = await models.Comment.count({
-        where: { post_id: post.post_id },
-      });
-      userPost.commentNum = comments;
-
-      return userPost;
+      return post.getPostInfo(user);
     });
     userPosts = await Promise.all(userPosts);
 
@@ -97,34 +66,8 @@ export class UserService {
     let votePosts = user.Posts;
 
     votePosts = votePosts.map(async post => {
-      const author = await models.User.findById(id, ['nickname']);
-
-      let votePost = {
-        postId: post.post_id,
-        title: post.post_title,
-        registerDate: post.register_date,
-        author: author.nickname,
-      };
-
-      const tags = await post.getTags({
-        attributes: ['tag_name'],
-      });
-      votePost.tags = tags.map(tag => {
-        return tag.tag_name;
-      });
-
-      const thumbnail = await post.getChoices({
-        attributes: ['photo_url'],
-        limit: 1,
-      });
-      votePost.thumbnail = thumbnail[0].photo_url;
-
-      const comments = await models.Comment.count({
-        where: { post_id: post.post_id },
-      });
-      votePost.commentNum = comments;
-
-      return votePost;
+      const author = await models.User.findById(post.user_id, ['nickname']);
+      return post.getPostInfo(author);
     });
     votePosts = await Promise.all(votePosts);
 
@@ -142,11 +85,8 @@ export class UserService {
 
   async addUserTag(userId, tagId) {
     const user = await models.User.findById(userId, ['user_id']);
-    let tags = tagId.map(async tag => {
-      return await models.Tag.findOne({
-        attributes: ['tag_id'],
-        where: { tag_id: tag.tagId },
-      });
+    let tags = tagId.map(async id => {
+      return await models.Tag.findById(id);
     });
     tags = await Promise.all(tags);
 
@@ -154,10 +94,8 @@ export class UserService {
   }
 
   async deleteUserTag(userId, tagId) {
-    tagId.forEach(async tag => {
-      await models.InterestedTag.destroy({
-        where: [{ user_id: userId }, { tag_id: tag.tagId }],
-      });
+    tagId.forEach(async () => {
+      await models.InterestedTag.deleteOneTag(userId, tagId);
     });
   }
 }

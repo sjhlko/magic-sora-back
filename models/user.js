@@ -69,6 +69,12 @@ export class User extends Model {
       ],
     });
   }
+
+  async getMyPosts() {
+    return await this.getPosts({
+      attributes: ['post_id', 'post_title', 'register_date'],
+    });
+  }
 }
 
 User.init(
