@@ -1,5 +1,5 @@
 import { Model, DataTypes } from 'sequelize';
-import { sequelize } from './index.js';
+import sequelize from './index.js';
 export class Choice extends Model {
   static associate(models) {
     this.belongsTo(models.Post, {

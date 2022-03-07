@@ -1,5 +1,5 @@
 import { Model, DataTypes } from 'sequelize';
-import { sequelize } from './index.js';
+import sequelize from './index.js';
 import crypto from 'crypto';
 
 function hash(password) {
@@ -30,6 +30,49 @@ export class User extends Model {
     this.belongsToMany(models.Post, {
       through: models.VoteByUser,
       foreignKey: 'user_id',
+    });
+  }
+
+  static async findById(id) {
+    return await this.findOne({
+      where: { user_id: id },
+    });
+  }
+
+  static async updateUser(id, newUser) {
+    const user = await this.findOne({
+      where: { user_id: id },
+    });
+    await user.update(newUser);
+    return user;
+  }
+
+  static async deleteUser(id) {
+    await this.destroy({
+      where: { user_id: id },
+    });
+  }
+
+  static async findWithAttribute(id, attributes) {
+    return await this.findOne({
+      where: { user_id: id },
+      attributes: attributes,
+    });
+  }
+
+  static async findWithModel(id, model, attributes) {
+    await this.findOne({
+      where: { user_id: id },
+      attributes: ['user_id'],
+      include: [
+        {
+          model: model,
+          attributes: attributes,
+          through: {
+            where: { user_id: id },
+          },
+        },
+      ],
     });
   }
 }

@@ -26,13 +26,13 @@ const models = {
   VoteByNonUser: VoteByNonUser,
 };
 
-function associate() {
+const associate = () => {
   User.associate(models);
   NonUser.associate(models);
   Post.associate(models);
   Choice.associate(models);
   Comment.associate(models);
   Tag.associate(models);
-}
+};
 
 export { models, associate };
