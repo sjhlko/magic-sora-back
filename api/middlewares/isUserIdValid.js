@@ -1,21 +1,17 @@
 import { models } from '../../models/init-models.js';
+import { CustomError, wrapAsyncError } from '../../library/index.js';
 
-const isUserIdValid = async (req, res, next) => {
+const isUserIdValid = wrapAsyncError(async (req, res, next) => {
   const id = req.params.id;
-  try {
-    const user = await models.User.findOne({
-      where: { user_id: id },
-      attributes: ['user_id'],
-    });
+  const user = await models.User.findOne({
+    where: { user_id: id },
+    attributes: ['user_id'],
+  });
 
-    if (!user) {
-      return res.status(404).send('User Not Found');
-    }
-    return next();
-  } catch (err) {
-    console.log('🔥 Error checking user id valid! ', err);
-    return next(err);
+  if (!user) {
+    throw new CustomError('Not Found', '🔥 User Not Found', 404);
   }
-};
+  next();
+});
 
 export default isUserIdValid;

@@ -11,6 +11,12 @@ export class Tag extends Model {
       foreignKey: 'tag_id',
     });
   }
+
+  static async findById(id) {
+    return await this.findOne({
+      where: { tag_id: id },
+    });
+  }
 }
 
 Tag.init(

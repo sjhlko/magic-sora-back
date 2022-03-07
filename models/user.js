@@ -33,9 +33,10 @@ export class User extends Model {
     });
   }
 
-  static async findById(id) {
+  static async findById(id, attributes) {
     return await this.findOne({
       where: { user_id: id },
+      attributes: attributes,
     });
   }
 
@@ -53,15 +54,8 @@ export class User extends Model {
     });
   }
 
-  static async findWithAttribute(id, attributes) {
-    return await this.findOne({
-      where: { user_id: id },
-      attributes: attributes,
-    });
-  }
-
   static async findWithModel(id, model, attributes) {
-    await this.findOne({
+    return await this.findOne({
       where: { user_id: id },
       attributes: ['user_id'],
       include: [
@@ -73,6 +67,12 @@ export class User extends Model {
           },
         },
       ],
+    });
+  }
+
+  async getMyPosts() {
+    return await this.getPosts({
+      attributes: ['post_id', 'post_title', 'register_date'],
     });
   }
 }

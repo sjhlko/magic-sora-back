@@ -1,7 +1,19 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from './index.js';
 
-export class InterestedTag extends Model {}
+export class InterestedTag extends Model {
+  static async deleteAllTags(userId) {
+    await this.destroy({
+      where: { user_id: userId },
+    });
+  }
+
+  static async deleteOneTag(userId, tagId) {
+    await this.destroy({
+      where: [{ user_id: userId }, { tag_id: tagId }],
+    });
+  }
+}
 
 InterestedTag.init(
   {
