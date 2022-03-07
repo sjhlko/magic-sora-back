@@ -1,6 +1,6 @@
 import config from '../config/index.js';
-import createTransporter from '../library/mailer.js';
 import { models } from '../models/init-models.js';
+import { createTransporter, CustomError } from '../library/index.js';
 
 export class UserService {
   constructor() {

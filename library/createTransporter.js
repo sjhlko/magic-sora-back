@@ -33,4 +33,4 @@ const createTransporter = async () => {
   return transporter;
 };
 
-export default createTransporter;
+export { createTransporter };
