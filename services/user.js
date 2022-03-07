@@ -6,7 +6,14 @@ export class UserService {
   constructor() {}
 
   async getUserById(id) {
-    return await models.User.findById(id);
+    return await models.User.findById(id, [
+      'user_id',
+      'nickname',
+      'birth_date',
+      'gender',
+      'mbti',
+      'profile_pic_url',
+    ]);
   }
 
   async updateUser(id, user) {
@@ -27,7 +34,7 @@ export class UserService {
   }
 
   async sendPasswordChangeEmail(id) {
-    const user = await models.User.findWithAttribute(id, ['user_email']);
+    const user = await models.User.findById(id, ['user_email']);
     const transporter = await createTransporter();
 
     await transporter.sendMail({
@@ -39,10 +46,7 @@ export class UserService {
   }
 
   async getUserPost(id) {
-    const user = await models.User.findWithAttribute(id, [
-      'user_id',
-      'nickname',
-    ]);
+    const user = await models.User.findById(id, ['user_id', 'nickname']);
     let userPosts = await user.getPosts({
       attributes: ['post_id', 'post_title', 'register_date'],
     });
@@ -90,7 +94,7 @@ export class UserService {
     let votePosts = user.Posts;
 
     votePosts = votePosts.map(async post => {
-      const author = await models.User.findWithAttribute(id, ['nickname']);
+      const author = await models.User.findById(id, ['nickname']);
 
       let votePost = {
         postId: post.post_id,
@@ -134,7 +138,7 @@ export class UserService {
   }
 
   async addUserTag(userId, tagId) {
-    const user = await models.User.findWithAttribute(userId, ['user_id']);
+    const user = await models.User.findById(userId, ['user_id']);
     let tags = tagId.map(async tag => {
       return await models.Tag.findOne({
         attributes: ['tag_id'],

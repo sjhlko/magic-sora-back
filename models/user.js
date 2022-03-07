@@ -33,9 +33,10 @@ export class User extends Model {
     });
   }
 
-  static async findById(id) {
+  static async findById(id, attributes) {
     return await this.findOne({
       where: { user_id: id },
+      attributes: attributes,
     });
   }
 
@@ -50,13 +51,6 @@ export class User extends Model {
   static async deleteUser(id) {
     await this.destroy({
       where: { user_id: id },
-    });
-  }
-
-  static async findWithAttribute(id, attributes) {
-    return await this.findOne({
-      where: { user_id: id },
-      attributes: attributes,
     });
   }
 
