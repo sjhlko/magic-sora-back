@@ -1,5 +1,15 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from './index.js';
+import crypto from 'crypto';
+
+function hash(password) {
+  //hashing 함수
+  return crypto
+    .createHmac('sha256', process.env.SECRET_KEY)
+    .update(password)
+    .digest('hex');
+}
+
 export class User extends Model {
   // model 간의 관계를 정의하는 함수 (다른 모델들도 모두 동일)
   static associate(models) {
@@ -37,7 +47,8 @@ User.init(
       allowNull: false,
     },
     password: {
-      type: DataTypes.STRING(12),
+      //hassing시 길이를 고려한 password길이 조정
+      type: DataTypes.STRING(255),
       allowNull: false,
     },
     user_name: {
@@ -82,3 +93,21 @@ User.init(
     ],
   },
 );
+
+User.localRegister = function ({
+  //비밀번호를 hashing하여 저장
+  user_email,
+  password,
+  user_name,
+  nickname,
+  birth_date,
+}) {
+  const user = new this({
+    user_email,
+    password: hash(password),
+    user_name,
+    nickname,
+    birth_date,
+  });
+  return user.save();
+};
