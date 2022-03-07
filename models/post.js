@@ -20,6 +20,11 @@ export class Post extends Model {
       through: models.VoteByUser,
       foreignKey: 'post_id',
     });
+
+    this.hasMany(models.VoteByUser, {
+      foreignKey : 'post_id', sourceKey: 'post_id'
+    });
+
     this.belongsToMany(models.NonUser, {
       through: models.VoteByNonUser,
       foreignKey: 'post_id',
