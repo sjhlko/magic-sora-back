@@ -3,21 +3,24 @@ import createTransporter from '../library/mailer.js';
 import { models } from '../models/init-models.js';
 
 export class UserService {
-  constructor() {}
-
-  async getUserById(id) {
-    return await models.User.findById(id, [
+  constructor() {
+    this.userAttributes = [
       'user_id',
       'nickname',
       'birth_date',
       'gender',
       'mbti',
       'profile_pic_url',
-    ]);
+    ];
+  }
+
+  async getUserById(id) {
+    return await models.User.findById(id, this.userAttributes);
   }
 
   async updateUser(id, user) {
-    return await models.User.updateUser(id, user);
+    await models.User.updateUser(id, user);
+    return await models.User.findById(id, this.userAttributes);
   }
 
   async deleteUser(id) {
