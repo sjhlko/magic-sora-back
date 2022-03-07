@@ -1,6 +1,10 @@
 import config from '../config/index.js';
 import { models } from '../models/init-models.js';
-import { createTransporter, CustomError } from '../library/index.js';
+import {
+  createTransporter,
+  hashPassword,
+  CustomError,
+} from '../library/index.js';
 
 export class UserService {
   constructor() {
@@ -19,6 +23,10 @@ export class UserService {
   }
 
   async updateUser(id, user) {
+    if (user.password) {
+      user.password = hashPassword(user.password);
+    }
+
     await models.User.updateUser(id, user);
     return await models.User.findById(id, this.userAttributes);
   }

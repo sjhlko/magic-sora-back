@@ -16,6 +16,11 @@ export default {
   databaseURL: process.env.SQL_URI,
 
   /**
+   * password hash secret key
+   */
+  hashSecret: process.env.SECRET_KEY,
+
+  /**
    * node mailer
    * google OAuth 2.0
    */
