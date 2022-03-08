@@ -7,9 +7,20 @@ import {
 } from '../library/index.js';
 
 export class AuthService {
-  constructor() {}
+  constructor() {
+    this.userAttributes = ['user_email', 'password'];
+  }
   async localRegister(newUser) {
     newUser.password = hashPassword(newUser.password);
     return await models.User.localRegister(newUser);
+  }
+
+  async getUserByEmail(email) {
+    return await models.User.findByEmail(email, this.userAttributes);
+  }
+
+  validatePassword(password, hashedPassword) {
+    const hashed = hashPassword(password);
+    return hashedPassword === hashed;
   }
 }
