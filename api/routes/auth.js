@@ -25,9 +25,26 @@ export default app => {
     }),
   );
 
-  route.post('/login/local', async (req, res) => {
-    return res.json('login');
-  });
+  route.post(
+    '/login/local',
+    wrapAsyncError(async (req, res) => {
+      const { user_email, password } = req.body;
+      let account = null;
+      account = await AuthServiceInstance.getUserByEmail(user_email);
+      if (!account) {
+        //가입여부 확인
+        return res.json('가입되어있지 않은 이메일');
+      } else if (
+        //비밀번호 비교
+        !AuthServiceInstance.validatePassword(password, account.password)
+      ) {
+        res.status = 403;
+        return res.json('비밀번호 오류');
+      }
+      res.body = account;
+      return res.json(res.body);
+    }),
+  );
 
   route.get('/exists/:key(email|username)/:value', async (req, res) => {
     return res.json('exits');
