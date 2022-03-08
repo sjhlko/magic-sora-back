@@ -20,6 +20,11 @@ export class Post extends Model {
       through: models.VoteByUser,
       foreignKey: 'post_id',
     });
+
+    this.hasMany(models.VoteByUser, {
+      foreignKey : 'post_id', sourceKey: 'post_id'
+    });
+
     this.belongsToMany(models.NonUser, {
       through: models.VoteByNonUser,
       foreignKey: 'post_id',
@@ -28,6 +33,34 @@ export class Post extends Model {
       through: models.TagOfPost,
       foreignKey: 'post_id',
     });
+  }
+
+  async getPostInfo(author) {
+    let tags = await this.getTags({
+      attributes: ['tag_name'],
+    });
+    tags = tags.map(tag => {
+      return tag.tag_name;
+    });
+
+    const thumbnail = await this.getChoices({
+      attributes: ['photo_url'],
+      limit: 1,
+    });
+
+    const comments = await this.getComments({
+      attributes: ['comment_id'],
+    });
+
+    return {
+      id: this.post_id,
+      title: this.post_title,
+      registerDate: this.register_date,
+      author: author.nickname,
+      tags: tags,
+      thumbnail: thumbnail[0].photo_url,
+      commentNum: comments.length,
+    };
   }
 }
 

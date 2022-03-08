@@ -1,7 +1,13 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from './index.js';
 
-export class LikeByUser extends Model {}
+export class LikeByUser extends Model {
+  static async deleteAllLikes(userId) {
+    await this.destroy({
+      where: { user_id: userId },
+    });
+  }
+}
 
 LikeByUser.init(
   {
