@@ -1,6 +1,5 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from './index.js';
-import crypto from 'crypto';
 
 export class User extends Model {
   // model 간의 관계를 정의하는 함수 (다른 모델들도 모두 동일)
@@ -31,8 +30,7 @@ export class User extends Model {
   }
 
   static async localRegister(newUser) {
-    const user = User.build(newUser);
-    return await user.save();
+    return await this.create(newUser);
   }
 
   static async findById(id, attributes) {
