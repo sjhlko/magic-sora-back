@@ -20,6 +20,12 @@ export default app => {
       console.log(req.body);
       let account = null;
       account = await AuthServiceInstance.localRegister(req.body);
+      let token = null;
+      token = await AuthServiceInstance.generateToken();
+      res.cookie('access_token', token, {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+      });
       res.body = account;
       return res.json(res.body);
     }),
@@ -41,16 +47,23 @@ export default app => {
         res.status = 403;
         return res.json('비밀번호 오류');
       }
+      let token = null;
+      token = await AuthServiceInstance.generateToken();
+      res.cookie('access_token', token, {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+      });
       res.body = account;
       return res.json(res.body);
     }),
   );
 
-  route.get('/exists/:key(email|username)/:value', async (req, res) => {
-    return res.json('exits');
-  });
-
   route.post('/logout', async (req, res) => {
+    res.cookie('access_token', null, {
+      maxAge: 0,
+      httpOnly: true,
+    });
+    res.status = 204;
     return res.json('logout');
   });
 };
