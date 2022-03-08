@@ -40,6 +40,13 @@ export class User extends Model {
     });
   }
 
+  static async findByEmail(email, attributes) {
+    return await this.findOne({
+      where: { user_email: email },
+      attributes: attributes,
+    });
+  }
+
   static async updateUser(id, newUser) {
     const user = await this.findOne({
       where: { user_id: id },
