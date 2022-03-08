@@ -23,4 +23,8 @@ export class AuthService {
     const hashed = hashPassword(password);
     return hashedPassword === hashed;
   }
+
+  async generateToken() {
+    return await models.User.generateToken();
+  }
 }

@@ -1,5 +1,6 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from './index.js';
+import { generateToken } from '../library/token.js';
 
 export class User extends Model {
   // model 간의 관계를 정의하는 함수 (다른 모델들도 모두 동일)
@@ -81,6 +82,13 @@ export class User extends Model {
     return await this.getPosts({
       attributes: ['post_id', 'post_title', 'register_date'],
     });
+  }
+
+  static async generateToken() {
+    const payload = {
+      user_id: this.user_id,
+    };
+    return generateToken(payload, 'user');
   }
 }
 
