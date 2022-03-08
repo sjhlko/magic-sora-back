@@ -27,7 +27,7 @@ export default app => {
         }],
         group : ['Post.post_id']
       });
-      //미...완...성...
+      //미완성!!! tag넣어야함
       res.send(results);
   })
 

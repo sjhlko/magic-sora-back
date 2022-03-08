@@ -9,8 +9,8 @@ export default () => {
   const app = Router();
   user(app);
   auth(app);
-  posts(app);
   search(app);
+  posts(app);
   insert(app);
   return app;
 };

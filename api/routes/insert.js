@@ -27,6 +27,7 @@ export default app =>{
   route.post('/', upload.array('image'), async(req, res)=>{
     const { post_title, post_content, nickname, tag, finish_date, choice, image } = req.body;
     //nickname은 로그인 정보에서 불러오기로 바꿔야함.
+    //글쓸때 로그인했는지안했는지 확인하는거필요
     const register_date = new Date();
     //register_date: 현재 시간
     const getUserId = await models.User.findOne({

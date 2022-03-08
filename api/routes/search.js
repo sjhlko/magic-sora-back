@@ -50,6 +50,6 @@ export default app =>{
             where: { user_id : user_id}
         })
     }
-    res.send(results);
+    res.json(results);
   })
 }
