@@ -31,6 +31,10 @@ export class User extends Model {
       through: models.VoteByUser,
       foreignKey: 'user_id',
     });
+
+    this.hasMany(models.VoteByUser, {
+      foreignKey : 'user_id', sourceKey: 'user_id'
+    });
   }
 
   static async findById(id, attributes) {

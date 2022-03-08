@@ -1,6 +1,15 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from './index.js';
-export class VoteByUser extends Model {}
+export class VoteByUser extends Model {
+  static associate(models){
+    this.belongsTo(models.Post, {
+      foreignKey: 'post_id', targetKey: 'post_id'
+    });
+    this.belongsTo(models.User, {
+      foreignKey: 'user_id', targetKey: 'user_id'
+    });
+  }
+}
 
 VoteByUser.init(
   {
