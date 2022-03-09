@@ -1,7 +1,7 @@
-import config from '../config/index.js';
 import { models } from '../models/init-models.js';
 import {
   createTransporter,
+  sendMail,
   hashPassword,
   CustomError,
 } from '../library/index.js';
@@ -41,15 +41,10 @@ export class UserService {
   }
 
   async sendPasswordChangeEmail(id) {
-    const user = await models.User.findById(id, ['user_email']);
+    const user = await models.User.findById(id, ['user_email', 'nickname']);
     const transporter = await createTransporter();
 
-    await transporter.sendMail({
-      from: `'Magic Soragodong' <${config.oauthUser}>`,
-      to: user.user_email,
-      subject: '🔮 마법의 익명고동 비밀번호 찾기',
-      text: '비밀번호 찾기',
-    });
+    await sendMail(transporter, user);
   }
 
   async getUserPost(id) {
