@@ -67,8 +67,8 @@ export class User extends Model {
     });
   }
 
-  static async findWithModel(id, model, attributes) {
-    return await this.findOne({
+  static async findWithModel(id, model, attributes, order) {
+    const options = {
       where: { user_id: id },
       attributes: ['user_id'],
       include: [
@@ -80,12 +80,19 @@ export class User extends Model {
           },
         },
       ],
-    });
+    };
+
+    if (order) {
+      options.order = [order];
+    }
+
+    return await this.findOne(options);
   }
 
   async getMyPosts() {
     return await this.getPosts({
       attributes: ['post_id', 'post_title', 'register_date'],
+      order: [['register_date', 'ASC']],
     });
   }
 

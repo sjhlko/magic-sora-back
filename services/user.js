@@ -60,12 +60,12 @@ export class UserService {
   }
 
   async getVotePost(id) {
-    const user = await models.User.findWithModel(id, models.Post, [
-      'post_id',
-      'user_id',
-      'post_title',
-      'register_date',
-    ]);
+    const user = await models.User.findWithModel(
+      id,
+      models.Post,
+      ['post_id', 'user_id', 'post_title', 'register_date'],
+      [models.Post, 'register_date', 'ASC'],
+    );
     let votePosts = user.Posts;
 
     votePosts = votePosts.map(async post => {
