@@ -133,9 +133,7 @@ export default app => {
     '/nickname-exists',
     middlewares.isNicknameExists,
     wrapAsyncError(async (req, res) => {
-      return res.json({
-        isExists: false,
-      });
+      return res.status(200);
     }),
   );
 
@@ -143,9 +141,7 @@ export default app => {
     '/email-exists',
     middlewares.isEmailExists,
     wrapAsyncError(async (req, res) => {
-      return res.json({
-        isExists: false,
-      });
+      return res.status(200);
     }),
   );
 };
