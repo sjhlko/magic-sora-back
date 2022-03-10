@@ -29,8 +29,8 @@ export default app => {
     middlewares.isNicknameExists,
     wrapAsyncError(async (req, res) => {
       const id = req.user_id;
-      let newUser = req.body;
-      newUser = await userServiceInstance.updateUser(id, newUser);
+      let { currentPass, newUser } = req.body;
+      newUser = await userServiceInstance.updateUser(id, currentPass, newUser);
 
       return res.json(newUser);
     }),
@@ -49,7 +49,7 @@ export default app => {
     }),
   );
 
-  route.get(
+  route.post(
     '/reset-password',
     middlewares.isAuth,
     middlewares.getCurrentUserId,

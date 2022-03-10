@@ -22,12 +22,25 @@ export class UserService {
     return await models.User.findById(id, this.userAttributes);
   }
 
-  async updateUser(id, user) {
-    if (user.password) {
-      user.password = hashPassword(user.password);
+  async updateUser(id, currentPass, newUser) {
+    if (currentPass === '') {
+      currentPass = hashPassword(currentPass);
+      const user = await models.User.findById(id, ['password']);
+
+      if (currentPass !== user.password) {
+        throw new CustomError(
+          'Password Invalid',
+          '🔥 Current Password Incorrect',
+          403,
+        );
+      }
     }
 
-    await models.User.updateUser(id, user);
+    if (newUser.password) {
+      newUser.password = hashPassword(newUser.password);
+    }
+
+    await models.User.updateUser(id, newUser);
     return await models.User.findById(id, this.userAttributes);
   }
 
