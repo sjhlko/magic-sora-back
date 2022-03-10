@@ -1,7 +1,12 @@
 import { Model, DataTypes } from 'sequelize';
-import sequelize from './index.js';
-
-export class TagOfPost extends Model {}
+import  sequelize from './index.js';
+export class TagOfPost extends Model {
+  static async deleteTagOfPost(id) {
+    await this.destroy({
+      where: { post_id: id },
+    });
+  }
+}
 
 TagOfPost.init(
   {
