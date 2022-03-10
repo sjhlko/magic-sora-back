@@ -1,14 +1,6 @@
 import { Model, DataTypes, Op } from 'sequelize';
 import sequelize from './index.js';
-import crypto from 'crypto';
-
-function hash(password) {
-  //hashing 함수
-  return crypto
-    .createHmac('sha256', process.env.SECRET_KEY)
-    .update(password)
-    .digest('hex');
-}
+import { generateToken } from '../library/token.js';
 
 export class User extends Model {
   // model 간의 관계를 정의하는 함수 (다른 모델들도 모두 동일)
@@ -33,8 +25,13 @@ export class User extends Model {
     });
 
     this.hasMany(models.VoteByUser, {
-      foreignKey : 'user_id', sourceKey: 'user_id'
+      foreignKey: 'user_id',
+      sourceKey: 'user_id',
     });
+  }
+
+  static async localRegister(newUser) {
+    return await this.create(newUser);
   }
 
   static async findById(id, attributes) {
@@ -44,6 +41,11 @@ export class User extends Model {
     });
   }
 
+
+  static async findByEmail(email, attributes) {
+    return await this.findOne({
+      where: { user_email: email },
+      
   static async findByNickname(nickname, attributes) {
     return await this.findOne({
       where: {nickname : {[Op.like]: nickname}},
@@ -65,8 +67,8 @@ export class User extends Model {
     });
   }
 
-  static async findWithModel(id, model, attributes) {
-    return await this.findOne({
+  static async findWithModel(id, model, attributes, order) {
+    const options = {
       where: { user_id: id },
       attributes: ['user_id'],
       include: [
@@ -78,13 +80,27 @@ export class User extends Model {
           },
         },
       ],
-    });
+    };
+
+    if (order) {
+      options.order = [order];
+    }
+
+    return await this.findOne(options);
   }
 
   async getMyPosts() {
     return await this.getPosts({
       attributes: ['post_id', 'post_title', 'register_date'],
+      order: [['register_date', 'ASC']],
     });
+  }
+
+  static async generateToken() {
+    const payload = {
+      user_id: this.user_id,
+    };
+    return generateToken(payload, 'user');
   }
 }
 
@@ -147,21 +163,3 @@ User.init(
     ],
   },
 );
-
-User.localRegister = function ({
-  //비밀번호를 hashing하여 저장
-  user_email,
-  password,
-  user_name,
-  nickname,
-  birth_date,
-}) {
-  const user = new this({
-    user_email,
-    password: hash(password),
-    user_name,
-    nickname,
-    birth_date,
-  });
-  return user.save();
-};

@@ -1,4 +1,6 @@
 import nodemailer from 'nodemailer';
+import path from 'path';
+import ejs from 'ejs';
 import { google } from 'googleapis';
 import config from '../config/index.js';
 
@@ -15,7 +17,7 @@ const createTransporter = async () => {
 
   const accessToken = await oauth2Client.getAccessToken();
 
-  const transporter = nodemailer.createTransport({
+  return nodemailer.createTransport({
     service: 'gmail',
     host: 'stmp.google.com',
     port: 587,
@@ -29,8 +31,21 @@ const createTransporter = async () => {
       accessToken: accessToken,
     },
   });
-
-  return transporter;
 };
 
-export { createTransporter };
+const sendMail = async (transporter, user) => {
+  const __dirname = path.resolve('public');
+
+  const data = await ejs.renderFile(__dirname + '/template.ejs', {
+    name: user.nickname,
+  });
+
+  await transporter.sendMail({
+    from: config.oauthUser,
+    to: user.user_email,
+    subject: '🔮 마법의 익명고동 비밀번호 재설정',
+    html: data,
+  });
+};
+
+export { createTransporter, sendMail };
