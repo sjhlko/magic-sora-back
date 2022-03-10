@@ -1,4 +1,4 @@
-import { Model, DataTypes } from 'sequelize';
+import { Model, DataTypes, Op } from 'sequelize';
 import sequelize from './index.js';
 import { generateToken } from '../library/token.js';
 
@@ -41,9 +41,14 @@ export class User extends Model {
     });
   }
 
+
   static async findByEmail(email, attributes) {
     return await this.findOne({
       where: { user_email: email },
+      
+  static async findByNickname(nickname, attributes) {
+    return await this.findOne({
+      where: {nickname : {[Op.like]: nickname}},
       attributes: attributes,
     });
   }
