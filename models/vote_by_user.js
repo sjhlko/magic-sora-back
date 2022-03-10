@@ -9,6 +9,11 @@ export class VoteByUser extends Model {
       foreignKey: 'user_id', targetKey: 'user_id'
     });
   }
+  static async deleteVoteByUser(id) {
+    await this.destroy({
+      where: { post_id: id },
+    });
+  }
 }
 
 VoteByUser.init(
