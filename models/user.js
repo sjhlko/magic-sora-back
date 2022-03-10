@@ -3,7 +3,6 @@ import sequelize from './index.js';
 import { generateToken } from '../library/token.js';
 
 export class User extends Model {
-  // model 간의 관계를 정의하는 함수 (다른 모델들도 모두 동일)
   static associate(models) {
     this.hasMany(models.Post, { foreignKey: 'user_id', sourceKey: 'user_id' });
     this.hasMany(models.Comment, {
@@ -118,12 +117,7 @@ User.init(
       allowNull: false,
     },
     password: {
-      //hassing시 길이를 고려한 password길이 조정
       type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-    user_name: {
-      type: DataTypes.STRING(20),
       allowNull: false,
     },
     nickname: {
