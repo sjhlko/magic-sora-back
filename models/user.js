@@ -1,4 +1,4 @@
-import { Model, DataTypes } from 'sequelize';
+import { Model, DataTypes, Op } from 'sequelize';
 import sequelize from './index.js';
 import crypto from 'crypto';
 
@@ -40,6 +40,13 @@ export class User extends Model {
   static async findById(id, attributes) {
     return await this.findOne({
       where: { user_id: id },
+      attributes: attributes,
+    });
+  }
+
+  static async findByNickname(nickname, attributes) {
+    return await this.findOne({
+      where: {nickname : {[Op.like]: nickname}},
       attributes: attributes,
     });
   }

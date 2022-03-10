@@ -7,6 +7,11 @@ export class Choice extends Model {
       targetKey: 'post_id',
     });
   }
+  static async deleteChoice(id) {
+    await this.destroy({
+      where: { post_id: id },
+    });
+  }
 }
 
 Choice.init(
