@@ -16,6 +16,11 @@ export default {
   databaseURL: process.env.SQL_URI,
 
   /**
+   * JsonWebToken
+   */
+  jwtSecret: process.env.JWT_SECRET,
+
+  /**
    * password hash secret key
    */
   hashSecret: process.env.SECRET_KEY,
