@@ -43,6 +43,7 @@ export class User extends Model {
   static async findByEmail(email, attributes) {
     return await this.findOne({
       where: { user_email: email },
+      attributes: attributes,
     });
   }
 

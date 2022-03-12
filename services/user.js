@@ -53,10 +53,16 @@ export class UserService {
     await models.LikeByUser.deleteAllLikes(id);
   }
 
-  async sendPasswordChangeEmail(id) {
-    const user = await models.User.findById(id, ['user_email', 'nickname']);
-    const transporter = await createTransporter();
+  async sendPasswordChangeEmail(email) {
+    const user = await models.User.findByEmail(email, [
+      'user_email',
+      'nickname',
+    ]);
+    if (!user) {
+      throw new CustomError('Not Found', '🔥 User Not Found', 404);
+    }
 
+    const transporter = await createTransporter();
     await sendMail(transporter, user);
   }
 

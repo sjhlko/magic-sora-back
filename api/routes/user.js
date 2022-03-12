@@ -51,11 +51,9 @@ export default app => {
 
   route.post(
     '/reset-password',
-    middlewares.isAuth,
-    middlewares.getCurrentUserId,
     wrapAsyncError(async (req, res) => {
-      const id = req.user_id;
-      await userServiceInstance.sendPasswordChangeEmail(id);
+      const userEmail = req.body.email;
+      await userServiceInstance.sendPasswordChangeEmail(userEmail);
 
       return res.sendStatus(200);
     }),
