@@ -49,11 +49,24 @@ export default app => {
     }),
   );
 
+  // 비밀번호 재설정 및 재설정 메일 전송
   route.post(
     '/reset-password',
     wrapAsyncError(async (req, res) => {
       const userEmail = req.body.email;
-      await userServiceInstance.sendPasswordChangeEmail(userEmail);
+      const resetCode = await userServiceInstance.sendResetPasswordEmail(
+        userEmail,
+      );
+
+      return res.json({ code: resetCode });
+    }),
+  );
+
+  route.patch(
+    '/reset-password',
+    wrapAsyncError(async (req, res) => {
+      const { token, newPassword } = req.body;
+      await userServiceInstance.resetPassword(token, newPassword);
 
       return res.sendStatus(200);
     }),

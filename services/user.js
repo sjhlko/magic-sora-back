@@ -4,6 +4,8 @@ import {
   sendMail,
   hashPassword,
   CustomError,
+  generateToken,
+  verifyToken,
 } from '../library/index.js';
 
 export class UserService {
@@ -23,7 +25,7 @@ export class UserService {
   }
 
   async updateUser(id, currentPass, newUser) {
-    if (currentPass === '') {
+    if (currentPass) {
       currentPass = hashPassword(currentPass);
       const user = await models.User.findById(id, ['password']);
 
@@ -34,9 +36,7 @@ export class UserService {
           403,
         );
       }
-    }
 
-    if (newUser.password) {
       newUser.password = hashPassword(newUser.password);
     }
 
@@ -53,7 +53,7 @@ export class UserService {
     await models.LikeByUser.deleteAllLikes(id);
   }
 
-  async sendPasswordChangeEmail(email) {
+  async sendResetPasswordEmail(email) {
     const user = await models.User.findByEmail(email, [
       'user_email',
       'nickname',
@@ -63,7 +63,25 @@ export class UserService {
     }
 
     const transporter = await createTransporter();
-    await sendMail(transporter, user);
+    const resetToken = await generateToken({
+      email: user.user_email,
+    });
+    const link = `http://localhost:3000/reset-password?code=${resetToken}`;
+    await sendMail(transporter, user, link);
+
+    return resetToken;
+  }
+
+  async resetPassword(resetToken, newPassword) {
+    const decoded = verifyToken(resetToken);
+    const user = await models.User.findByEmail(decoded.email, ['user_id']);
+
+    if (!user) {
+      throw new CustomError('Not Found', 'User Not Found', 404);
+    }
+
+    newPassword = hashPassword(newPassword);
+    await models.User.updateUser(user.user_id, { password: newPassword });
   }
 
   async getUserPost(id) {
