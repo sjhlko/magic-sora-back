@@ -57,7 +57,15 @@ export class Post extends Model {
   }
   static async getPostById(id){
     return await this.findOne({
+      attributes: ['post_id'],
       where: {post_id : id},
+    })
+  }
+  static async getLatestPost(){
+    return await this.findOne({
+      attribues: ['post_id'],
+      order:[['post_id', 'DESC']],
+      limit: 1
     })
   }
   static async deletePost(id) {
@@ -85,6 +93,13 @@ export class Post extends Model {
       order : [['post_id', 'DESC']]
     })
   }
+  static async getFavTagPost(post_id){
+    return await this.findAll({
+      attributes: ['post_id', 'user_id', 'post_title', 'register_date'],
+      where: { post_id : post_id },
+      order : [['post_id', 'DESC']]
+    })
+  }
   static async getHotPost(){
     return await this.findAll({
       attributes: {
@@ -98,7 +113,7 @@ export class Post extends Model {
       order : [[sequelize.col('count'), 'DESC']]
     })
   }
-//###########################################//
+
   async getPostInfo(author) {
     let tags = await this.getTags({
       attributes: ['tag_name'],
