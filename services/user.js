@@ -4,7 +4,10 @@ import {
   sendMail,
   hashPassword,
   CustomError,
+  generateToken,
+  verifyToken,
 } from '../library/index.js';
+import config from '../config/index.js';
 
 export class UserService {
   constructor() {
@@ -22,12 +25,23 @@ export class UserService {
     return await models.User.findById(id, this.userAttributes);
   }
 
-  async updateUser(id, user) {
-    if (user.password) {
-      user.password = hashPassword(user.password);
+  async updateUser(id, currentPass, newUser) {
+    if (currentPass) {
+      currentPass = hashPassword(currentPass);
+      const user = await models.User.findById(id, ['password']);
+
+      if (currentPass !== user.password) {
+        throw new CustomError(
+          'Password Invalid',
+          '🔥 Current Password Incorrect',
+          403,
+        );
+      }
+
+      newUser.password = hashPassword(newUser.password);
     }
 
-    await models.User.updateUser(id, user);
+    await models.User.updateUser(id, newUser);
     return await models.User.findById(id, this.userAttributes);
   }
 
@@ -40,11 +54,30 @@ export class UserService {
     await models.LikeByUser.deleteAllLikes(id);
   }
 
-  async sendPasswordChangeEmail(id) {
-    const user = await models.User.findById(id, ['user_email', 'nickname']);
+  async sendResetPasswordEmail(user) {
     const transporter = await createTransporter();
+    const secret = user.password + '_' + new Date().getDate();
+    const resetToken = await generateToken({ id: user.user_id }, secret);
+    const link = `${config.clientURL}/reset-password?code=${resetToken}&id=${user.user_id}`;
 
-    await sendMail(transporter, user);
+    await sendMail(transporter, user, link);
+    return resetToken;
+  }
+
+  async resetPassword(user, resetToken, newPassword) {
+    const secret = user.password + '_' + new Date().getDate();
+    const decoded = verifyToken(resetToken, secret);
+
+    if (decoded.id != user.user_id) {
+      throw new CustomError(
+        'Bad Request',
+        '🔥 User Id Differ with Token Id',
+        400,
+      );
+    }
+
+    newPassword = hashPassword(newPassword);
+    await models.User.updateUser(user.user_id, { password: newPassword });
   }
 
   async getUserPost(id) {
