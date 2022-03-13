@@ -52,21 +52,22 @@ export default app => {
   // 비밀번호 재설정 및 재설정 메일 전송
   route.post(
     '/reset-password',
+    middlewares.isEmailValid,
     wrapAsyncError(async (req, res) => {
-      const userEmail = req.body.email;
-      const resetCode = await userServiceInstance.sendResetPasswordEmail(
-        userEmail,
-      );
+      const user = req.user;
+      const resetToken = await userServiceInstance.sendResetPasswordEmail(user);
 
-      return res.json({ code: resetCode });
+      return res.json({ id: user.user_id, code: resetToken });
     }),
   );
 
   route.patch(
     '/reset-password',
+    middlewares.isUserIdValid,
     wrapAsyncError(async (req, res) => {
-      const { token, newPassword } = req.body;
-      await userServiceInstance.resetPassword(token, newPassword);
+      const user = req.user;
+      const { code, newPassword } = req.body;
+      await userServiceInstance.resetPassword(user, code, newPassword);
 
       return res.sendStatus(200);
     }),

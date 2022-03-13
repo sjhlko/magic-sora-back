@@ -7,6 +7,7 @@ import {
   generateToken,
   verifyToken,
 } from '../library/index.js';
+import config from '../config/index.js';
 
 export class UserService {
   constructor() {
@@ -53,31 +54,26 @@ export class UserService {
     await models.LikeByUser.deleteAllLikes(id);
   }
 
-  async sendResetPasswordEmail(email) {
-    const user = await models.User.findByEmail(email, [
-      'user_email',
-      'nickname',
-    ]);
-    if (!user) {
-      throw new CustomError('Not Found', '🔥 User Not Found', 404);
-    }
-
+  async sendResetPasswordEmail(user) {
     const transporter = await createTransporter();
-    const resetToken = await generateToken({
-      email: user.user_email,
-    });
-    const link = `http://localhost:3000/reset-password?code=${resetToken}`;
-    await sendMail(transporter, user, link);
+    const secret = user.password + '_' + new Date().getDate();
+    const resetToken = await generateToken({ id: user.user_id }, secret);
+    const link = `${config.clientURL}/reset-password?code=${resetToken}&id=${user.user_id}`;
 
+    await sendMail(transporter, user, link);
     return resetToken;
   }
 
-  async resetPassword(resetToken, newPassword) {
-    const decoded = verifyToken(resetToken);
-    const user = await models.User.findByEmail(decoded.email, ['user_id']);
+  async resetPassword(user, resetToken, newPassword) {
+    const secret = user.password + '_' + new Date().getDate();
+    const decoded = verifyToken(resetToken, secret);
 
-    if (!user) {
-      throw new CustomError('Not Found', 'User Not Found', 404);
+    if (decoded.id != user.user_id) {
+      throw new CustomError(
+        'Bad Request',
+        '🔥 User Id Differ with Token Id',
+        400,
+      );
     }
 
     newPassword = hashPassword(newPassword);
