@@ -11,7 +11,7 @@ export default app =>{
     '/',
     wrapAsyncError(async(req, res)=>{
       const tags = await tagServiceInstance.getAllTags();
-      res.send(tags);
+      res.json(tags);
     })
   )
 }

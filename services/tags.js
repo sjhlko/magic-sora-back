@@ -16,7 +16,6 @@ export class TagsService {
 				tag_name: tag.tag_name
       };
 		})
-		console.log(tags);
 		return tags;
 	}
 }

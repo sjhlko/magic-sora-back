@@ -8,7 +8,7 @@ export default () => {
   const app = Router();
   user(app);
   auth(app);
-  tags(app);
   posts(app);
+  tags(app);
   return app;
 };
