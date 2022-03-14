@@ -39,6 +39,7 @@ export class PostService{
   async deletePost(id){
     await models.VoteByUser.deleteVoteByUser(id);
     await models.Choice.deleteChoice(id);
+    await models.Comment.deleteComment(id);
     await models.TagOfPost.deleteTagOfPost(id);
     await models.Post.deletePost(id);
   }
