@@ -1,17 +1,18 @@
 import config from '../config/index.js';
 import { models } from '../models/init-models.js';
+import { generateToken } from '../library/token.js';
 import {
   createTransporter,
   hashPassword,
   CustomError,
 } from '../library/index.js';
+import user from '../api/routes/user.js';
 
 export class AuthService {
   constructor() {
-    this.userAttributes = ['user_email', 'password'];
+    this.userAttributes = ['user_id', 'user_email', 'password'];
   }
   async localRegister(newUser) {
-    newUser.password = hashPassword(newUser.password);
     return await models.User.localRegister(newUser);
   }
 
@@ -24,7 +25,26 @@ export class AuthService {
     return hashedPassword === hashed;
   }
 
-  async generateToken() {
-    return await models.User.generateToken();
+  async generateToken(userID) {
+    const payload = {
+      user_id: userID,
+    };
+    return await generateToken(payload);
+  }
+
+  loginConfirm(account, password) {
+    if (!account) {
+      //가입여부 확인
+      throw new CustomError(
+        'Bad Request',
+        '🔥 가입되지 않은 이메일인데요?',
+        403,
+      );
+    } else if (
+      //비밀번호 비교
+      !this.validatePassword(password, account.password)
+    ) {
+      throw new CustomError('Bad Request', '🔥 비밀번호를 다시쳐보세요', 403);
+    }
   }
 }

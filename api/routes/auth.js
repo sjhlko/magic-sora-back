@@ -4,7 +4,6 @@ import { wrapAsyncError } from '../../library/index.js';
 import { AuthService } from '../../services/auth.js';
 import middlewares from '../middlewares/index.js';
 const AuthServiceInstance = new AuthService();
-import Joi from 'joi';
 const route = Router();
 
 export default app => {
@@ -18,10 +17,8 @@ export default app => {
     middlewares.isNicknameExists,
     wrapAsyncError(async (req, res) => {
       console.log(req.body);
-      let account = null;
-      account = await AuthServiceInstance.localRegister(req.body);
-      let token = null;
-      token = await AuthServiceInstance.generateToken();
+      const account = await AuthServiceInstance.localRegister(req.body);
+      const token = await AuthServiceInstance.generateToken(account.user_id);
       res.cookie('access_token', token, {
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 7,
@@ -35,20 +32,9 @@ export default app => {
     '/login/local',
     wrapAsyncError(async (req, res) => {
       const { user_email, password } = req.body;
-      let account = null;
-      account = await AuthServiceInstance.getUserByEmail(user_email);
-      if (!account) {
-        //가입여부 확인
-        return res.json('가입되어있지 않은 이메일');
-      } else if (
-        //비밀번호 비교
-        !AuthServiceInstance.validatePassword(password, account.password)
-      ) {
-        res.status = 403;
-        return res.json('비밀번호 오류');
-      }
-      let token = null;
-      token = await AuthServiceInstance.generateToken();
+      const account = await AuthServiceInstance.getUserByEmail(user_email);
+      AuthServiceInstance.loginConfirm(account, password);
+      const token = await AuthServiceInstance.generateToken(account.user_id);
       res.cookie('access_token', token, {
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 7,

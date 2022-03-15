@@ -90,13 +90,6 @@ export class User extends Model {
       order: [['register_date', 'ASC']],
     });
   }
-
-  static async generateToken() {
-    const payload = {
-      user_id: this.user_id,
-    };
-    return generateToken(payload, 'user');
-  }
 }
 
 User.init(
