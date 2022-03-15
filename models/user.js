@@ -1,6 +1,6 @@
 import { Model, DataTypes, Op } from 'sequelize';
 import sequelize from './index.js';
-import { generateToken } from '../library/token.js';
+import { generateToken, hashPassword } from '../library/index.js';
 
 export class User extends Model {
   static associate(models) {
@@ -62,12 +62,6 @@ export class User extends Model {
     return user;
   }
 
-  static async deleteUser(id) {
-    await this.destroy({
-      where: { user_id: id },
-    });
-  }
-
   static async findWithModel(id, model, attributes, order) {
     const options = {
       where: { user_id: id },
@@ -120,6 +114,9 @@ User.init(
     password: {
       type: DataTypes.STRING(255),
       allowNull: false,
+      set(value) {
+        this.setDataValue('password', hashPassword(value));
+      },
     },
     nickname: {
       type: DataTypes.STRING(8),

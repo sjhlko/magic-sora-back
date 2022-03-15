@@ -1,4 +1,4 @@
-import { Model, DataTypes, where, Op} from 'sequelize';
+import { Model, DataTypes, Op } from 'sequelize';
 import sequelize from './index.js';
 import { models } from './init-models.js';
 
@@ -114,7 +114,7 @@ export class Post extends Model {
     })
   }
 
-  async getPostInfo(author) {
+  async getPostInfo(authorName) {
     let tags = await this.getTags({
       attributes: ['tag_name'],
     });
@@ -135,13 +135,13 @@ export class Post extends Model {
       id: this.post_id,
       title: this.post_title,
       registerDate: this.register_date,
-      author: author.nickname,
+      author: authorName,
       tags: tags,
       thumbnail: thumbnail[0].photo_url,
       commentNum: comments.length,
     };
   }
-  async getPostDetailInfo(author) {
+  async getPostDetailInfo(authorName) {
     let tags = await this.getTags({
       attributes: ['tag_name'],
     });
@@ -162,7 +162,7 @@ export class Post extends Model {
       content: this.post_content,
       registerDate: this.register_date,
       finishDate: this.finish_date,
-      author: author.nickname,
+      author: authorName,
       tags: tags,
       choice_content: choice_content,
       photo_url: photo_url
@@ -180,7 +180,7 @@ Post.init(
     },
     user_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'user',
         key: 'user_id',
