@@ -62,12 +62,6 @@ export class User extends Model {
     return user;
   }
 
-  static async deleteUser(id) {
-    await this.destroy({
-      where: { user_id: id },
-    });
-  }
-
   static async findWithModel(id, model, attributes, order) {
     const options = {
       where: { user_id: id },

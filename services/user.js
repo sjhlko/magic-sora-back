@@ -44,12 +44,21 @@ export class UserService {
   }
 
   async deleteUser(id) {
-    await models.User.deleteUser(id);
+    const user = await models.User.findById(id, ['user_id']);
 
-    // 관심 태그 삭제
+    const posts = await user.getPosts();
+    posts.forEach(async post => {
+      await post.update({ user_id: null });
+    });
+
+    const comments = await user.getComments();
+    comments.forEach(async comment => {
+      await comment.update({ user_id: null });
+    });
+
     await models.InterestedTag.deleteAllTags(id);
-    // 댓글 좋아요 삭제
     await models.LikeByUser.deleteAllLikes(id);
+    await user.destroy(id);
   }
 
   async sendResetPasswordEmail(user) {
@@ -73,7 +82,7 @@ export class UserService {
         400,
       );
     }
-    
+
     await models.User.updateUser(user.user_id, { password: newPassword });
   }
 
@@ -82,7 +91,7 @@ export class UserService {
     let userPosts = await user.getMyPosts();
 
     userPosts = userPosts.map(async post => {
-      return post.getPostInfo(user);
+      return post.getPostInfo(user.nickname);
     });
     userPosts = await Promise.all(userPosts);
 
@@ -100,7 +109,8 @@ export class UserService {
 
     votePosts = votePosts.map(async post => {
       const author = await models.User.findById(post.user_id, ['nickname']);
-      return post.getPostInfo(author);
+      const authorName = author ? author.nickname : '알 수 없음';
+      return post.getPostInfo(authorName);
     });
     votePosts = await Promise.all(votePosts);
 
