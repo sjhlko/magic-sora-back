@@ -1,5 +1,5 @@
-import { wrapAsyncError, CustomError } from '../../library/index.js';
 import { models } from '../../models/init-models.js';
+import { wrapAsyncError, CustomError } from '../../library/index.js';
 
 const isEmailValid = wrapAsyncError(async (req, res, next) => {
   const email = req.body.email;
