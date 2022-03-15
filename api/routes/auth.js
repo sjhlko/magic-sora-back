@@ -21,7 +21,7 @@ export default app => {
       const token = await AuthServiceInstance.generateToken(account.user_id);
       res.cookie('access_token', token, {
         httpOnly: true,
-        maxAge: 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 600,
       });
       res.body = account;
       return res.json(res.body);
@@ -37,7 +37,7 @@ export default app => {
       const token = await AuthServiceInstance.generateToken(account.user_id);
       res.cookie('access_token', token, {
         httpOnly: true,
-        maxAge: 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 600,
       });
       res.body = account;
       return res.json(res.body);
@@ -45,11 +45,7 @@ export default app => {
   );
 
   route.post('/logout', async (req, res) => {
-    res.cookie('access_token', null, {
-      maxAge: 0,
-      httpOnly: true,
-    });
-    res.status = 204;
-    return res.json('logout');
+    res.clearCookie('access_token');
+    res.status(200).json('로그아웃 성공');
   });
 };
