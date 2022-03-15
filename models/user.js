@@ -1,6 +1,6 @@
 import { Model, DataTypes, Op } from 'sequelize';
 import sequelize from './index.js';
-import { generateToken } from '../library/token.js';
+import { generateToken, hashPassword } from '../library/index.js';
 
 export class User extends Model {
   static associate(models) {
@@ -120,6 +120,9 @@ User.init(
     password: {
       type: DataTypes.STRING(255),
       allowNull: false,
+      set(value) {
+        this.setDataValue('password', hashPassword(value));
+      },
     },
     nickname: {
       type: DataTypes.STRING(8),

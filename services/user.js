@@ -37,8 +37,6 @@ export class UserService {
           403,
         );
       }
-
-      newUser.password = hashPassword(newUser.password);
     }
 
     await models.User.updateUser(id, newUser);
@@ -75,8 +73,7 @@ export class UserService {
         400,
       );
     }
-
-    newPassword = hashPassword(newPassword);
+    
     await models.User.updateUser(user.user_id, { password: newPassword });
   }
 
