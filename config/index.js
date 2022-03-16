@@ -11,6 +11,11 @@ export default {
   port: parseInt(process.env.PORT, 10),
 
   /**
+   * client URL
+   */
+  clientURL: process.env.CLIENT_URL,
+
+  /**
    * DB
    */
   databaseURL: process.env.SQL_URI,

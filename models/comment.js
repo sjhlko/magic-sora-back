@@ -20,6 +20,11 @@ export class Comment extends Model {
       targetKey: 'user_id',
     });
   }
+  static async deleteComment(id) {
+    await this.destroy({
+      where: { post_id: id },
+    });
+  }
 }
 
 Comment.init(
@@ -40,7 +45,7 @@ Comment.init(
     },
     user_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: 'user',
         key: 'user_id',

@@ -33,11 +33,12 @@ const createTransporter = async () => {
   });
 };
 
-const sendMail = async (transporter, user) => {
+const sendMail = async (transporter, user, link) => {
   const __dirname = path.resolve('public');
 
   const data = await ejs.renderFile(__dirname + '/template.ejs', {
     name: user.nickname,
+    link: link,
   });
 
   await transporter.sendMail({

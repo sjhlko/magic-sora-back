@@ -29,8 +29,8 @@ export default app => {
     middlewares.isNicknameExists,
     wrapAsyncError(async (req, res) => {
       const id = req.user_id;
-      let newUser = req.body;
-      newUser = await userServiceInstance.updateUser(id, newUser);
+      let { currentPass, newUser } = req.body;
+      newUser = await userServiceInstance.updateUser(id, currentPass, newUser);
 
       return res.json(newUser);
     }),
@@ -49,13 +49,25 @@ export default app => {
     }),
   );
 
-  route.get(
+  // 비밀번호 재설정 및 재설정 메일 전송
+  route.post(
     '/reset-password',
-    middlewares.isAuth,
-    middlewares.getCurrentUserId,
+    middlewares.isEmailValid,
     wrapAsyncError(async (req, res) => {
-      const id = req.user_id;
-      await userServiceInstance.sendPasswordChangeEmail(id);
+      const user = req.user;
+      const resetToken = await userServiceInstance.sendResetPasswordEmail(user);
+
+      return res.json({ id: user.user_id, code: resetToken });
+    }),
+  );
+
+  route.patch(
+    '/reset-password',
+    middlewares.isUserIdValid,
+    wrapAsyncError(async (req, res) => {
+      const user = req.user;
+      const { code, newPassword } = req.body;
+      await userServiceInstance.resetPassword(user, code, newPassword);
 
       return res.sendStatus(200);
     }),
@@ -133,7 +145,7 @@ export default app => {
     '/nickname-exists',
     middlewares.isNicknameExists,
     wrapAsyncError(async (req, res) => {
-      return res.status(200);
+      return res.sendStatus(200);
     }),
   );
 
@@ -141,7 +153,7 @@ export default app => {
     '/email-exists',
     middlewares.isEmailExists,
     wrapAsyncError(async (req, res) => {
-      return res.status(200);
+      return res.sendStatus(200);
     }),
   );
 };

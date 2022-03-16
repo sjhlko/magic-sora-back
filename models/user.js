@@ -1,9 +1,8 @@
 import { Model, DataTypes, Op } from 'sequelize';
 import sequelize from './index.js';
-import { generateToken } from '../library/token.js';
+import { generateToken, hashPassword } from '../library/index.js';
 
 export class User extends Model {
-  // model 간의 관계를 정의하는 함수 (다른 모델들도 모두 동일)
   static associate(models) {
     this.hasMany(models.Post, { foreignKey: 'user_id', sourceKey: 'user_id' });
     this.hasMany(models.Comment, {
@@ -41,14 +40,16 @@ export class User extends Model {
     });
   }
 
-
   static async findByEmail(email, attributes) {
     return await this.findOne({
       where: { user_email: email },
-      
+      attributes: attributes,
+    });
+  }
+
   static async findByNickname(nickname, attributes) {
     return await this.findOne({
-      where: {nickname : {[Op.like]: nickname}},
+      where: { nickname: { [Op.like]: nickname } },
       attributes: attributes,
     });
   }
@@ -59,12 +60,6 @@ export class User extends Model {
     });
     await user.update(newUser);
     return user;
-  }
-
-  static async deleteUser(id) {
-    await this.destroy({
-      where: { user_id: id },
-    });
   }
 
   static async findWithModel(id, model, attributes, order) {
@@ -117,13 +112,11 @@ User.init(
       allowNull: false,
     },
     password: {
-      //hassing시 길이를 고려한 password길이 조정
       type: DataTypes.STRING(255),
       allowNull: false,
-    },
-    user_name: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
+      set(value) {
+        this.setDataValue('password', hashPassword(value));
+      },
     },
     nickname: {
       type: DataTypes.STRING(8),

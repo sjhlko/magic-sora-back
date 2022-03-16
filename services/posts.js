@@ -28,8 +28,9 @@ export class PostService{
     }
 
     posts = posts.map(async (post)=>{
-      const user = await models.User.findById(post.user_id, ['nickname']);
-      return post.getPostInfo(user);
+      const author = await models.User.findById(post.user_id, ['nickname']);
+      const authorName = author ? author.nickname : '알 수 없음';
+      return post.getPostInfo(authorName);
     })
     posts = await Promise.all(posts);
 
@@ -39,6 +40,7 @@ export class PostService{
   async deletePost(id){
     await models.VoteByUser.deleteVoteByUser(id);
     await models.Choice.deleteChoice(id);
+    await models.Comment.deleteComment(id);
     await models.TagOfPost.deleteTagOfPost(id);
     await models.Post.deletePost(id);
   }
@@ -61,8 +63,9 @@ export class PostService{
         posts = await models.Post.searchPostContent(search) 
       }
       posts = posts.map(async (post)=>{
-        const user = await models.User.findById(post.user_id, ['nickname']);
-        return post.getPostInfo(user);
+        const author = await models.User.findById(post.user_id, ['nickname']);
+        const authorName = author ? author.nickname : '알 수 없음';
+        return post.getPostInfo(authorName);
       })
     }
     posts = await Promise.all(posts);
@@ -70,9 +73,10 @@ export class PostService{
   }
   async getPostDetail(id){
     let post = await models.Post.getPostById(id);
-    const user = await models.User.findById(post.user_id, ['nickname']);
+    const author = await models.User.findById(post.user_id, ['nickname']);
+    const authorName = author ? author.nickname : '알 수 없음';
 
-    post = post.getPostDetailInfo(user);
+    post = post.getPostDetailInfo(authorName);
     return post;
   }
 

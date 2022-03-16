@@ -4,7 +4,10 @@ import {
   sendMail,
   hashPassword,
   CustomError,
+  generateToken,
+  verifyToken,
 } from '../library/index.js';
+import config from '../config/index.js';
 
 export class UserService {
   constructor() {
@@ -22,29 +25,65 @@ export class UserService {
     return await models.User.findById(id, this.userAttributes);
   }
 
-  async updateUser(id, user) {
-    if (user.password) {
-      user.password = hashPassword(user.password);
+  async updateUser(id, currentPass, newUser) {
+    if (currentPass) {
+      currentPass = hashPassword(currentPass);
+      const user = await models.User.findById(id, ['password']);
+
+      if (currentPass !== user.password) {
+        throw new CustomError(
+          'Password Invalid',
+          '🔥 Current Password Incorrect',
+          403,
+        );
+      }
     }
 
-    await models.User.updateUser(id, user);
+    await models.User.updateUser(id, newUser);
     return await models.User.findById(id, this.userAttributes);
   }
 
   async deleteUser(id) {
-    await models.User.deleteUser(id);
+    const user = await models.User.findById(id, ['user_id']);
 
-    // 관심 태그 삭제
+    const posts = await user.getPosts();
+    posts.forEach(async post => {
+      await post.update({ user_id: null });
+    });
+
+    const comments = await user.getComments();
+    comments.forEach(async comment => {
+      await comment.update({ user_id: null });
+    });
+
     await models.InterestedTag.deleteAllTags(id);
-    // 댓글 좋아요 삭제
     await models.LikeByUser.deleteAllLikes(id);
+    await user.destroy(id);
   }
 
-  async sendPasswordChangeEmail(id) {
-    const user = await models.User.findById(id, ['user_email', 'nickname']);
+  async sendResetPasswordEmail(user) {
     const transporter = await createTransporter();
+    const secret = user.password + '_' + new Date().getDate();
+    const resetToken = await generateToken({ id: user.user_id }, secret);
+    const link = `${config.clientURL}/reset-password?code=${resetToken}&id=${user.user_id}`;
 
-    await sendMail(transporter, user);
+    await sendMail(transporter, user, link);
+    return resetToken;
+  }
+
+  async resetPassword(user, resetToken, newPassword) {
+    const secret = user.password + '_' + new Date().getDate();
+    const decoded = verifyToken(resetToken, secret);
+
+    if (decoded.id != user.user_id) {
+      throw new CustomError(
+        'Bad Request',
+        '🔥 User Id Differ with Token Id',
+        400,
+      );
+    }
+
+    await models.User.updateUser(user.user_id, { password: newPassword });
   }
 
   async getUserPost(id) {
@@ -52,7 +91,7 @@ export class UserService {
     let userPosts = await user.getMyPosts();
 
     userPosts = userPosts.map(async post => {
-      return post.getPostInfo(user);
+      return post.getPostInfo(user.nickname);
     });
     userPosts = await Promise.all(userPosts);
 
@@ -70,7 +109,8 @@ export class UserService {
 
     votePosts = votePosts.map(async post => {
       const author = await models.User.findById(post.user_id, ['nickname']);
-      return post.getPostInfo(author);
+      const authorName = author ? author.nickname : '알 수 없음';
+      return post.getPostInfo(authorName);
     });
     votePosts = await Promise.all(votePosts);
 
@@ -89,7 +129,7 @@ export class UserService {
   async addUserTag(userId, tagId) {
     const user = await models.User.findById(userId, ['user_id']);
     let tags = tagId.map(async id => {
-      return await models.Tag.findById(id);
+      return await models.Tag.findById(id.tag_id);
     });
     tags = await Promise.all(tags);
 
@@ -97,8 +137,8 @@ export class UserService {
   }
 
   async deleteUserTag(userId, tagId) {
-    tagId.forEach(async () => {
-      await models.InterestedTag.deleteOneTag(userId, tagId);
+    tagId.forEach(async id => {
+      await models.InterestedTag.deleteOneTag(userId, id.tag_id);
     });
   }
 }

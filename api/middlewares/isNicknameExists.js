@@ -4,9 +4,7 @@ import { CustomError, wrapAsyncError } from '../../library/index.js';
 const isNicknameExists = wrapAsyncError(async (req, res, next) => {
   const nickname = req.query.nickname || req.body.nickname;
   if (nickname) {
-    const user = await models.User.findOne({
-      where: { nickname: nickname },
-    });
+    const user = await models.User.findByNickname(nickname, ['user_id']);
 
     if (user) {
       throw new CustomError(
