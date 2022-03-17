@@ -1,6 +1,6 @@
 import config from '../config/index.js';
 import { models } from '../models/init-models.js';
-import { generateToken } from '../library/token.js';
+import { generateToken, verifyToken, refreshToken } from '../library/token.js';
 import {
   createTransporter,
   hashPassword,
@@ -25,11 +25,19 @@ export class AuthService {
     return hashedPassword === hashed;
   }
 
-  async generateToken(userID) {
+  async generateAccessToken(userID) {
     const payload = {
       user_id: userID,
     };
     return await generateToken(payload);
+  }
+
+  async generateRefreshToken() {
+    return await refreshToken();
+  }
+
+  async updateRefreshToken(userID, refreshToken) {
+    await models.User.updateUser(userID, { refresh_token: refreshToken });
   }
 
   loginConfirm(account, password) {
