@@ -2,7 +2,7 @@ import { models } from '../../models/init-models.js';
 import { CustomError, wrapAsyncError } from '../../library/index.js';
 
 const getCurrentUserId = wrapAsyncError(async (req, res, next) => {
-  const user = await models.User.findById(req.token_id, ['user_id']);
+  const user = await models.User.findById(req.accessToken_id, ['user_id']);
 
   if (!user) {
     throw new CustomError('Unauthorized', '🔥 User Not Found', 401);
