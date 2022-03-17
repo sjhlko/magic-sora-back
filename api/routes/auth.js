@@ -18,32 +18,48 @@ export default app => {
     wrapAsyncError(async (req, res) => {
       console.log(req.body);
       const account = await AuthServiceInstance.localRegister(req.body);
-      const token = await AuthServiceInstance.generateToken(account.user_id);
-      res.cookie('access_token', token, {
+      const accessToken = await AuthServiceInstance.generateAccessToken(
+        account.user_id,
+      );
+      const refreshToken = await AuthServiceInstance.generateRefreshToken();
+      AuthServiceInstance.updateRefreshToken(account.user_id, refreshToken);
+      res.cookie('access_token', accessToken, {
         httpOnly: true,
-        maxAge: 1000 * 600,
+        maxAge: 1000 * 60 * 60 * 24 * 7,
       });
-      res.body = account;
-      return res.json(res.body);
+      res.status(200).send({
+        data: {
+          refreshToken,
+        },
+      });
     }),
   );
 
   route.post(
+    //로컬 로그인
     '/login/local',
     wrapAsyncError(async (req, res) => {
       const { user_email, password } = req.body;
       const account = await AuthServiceInstance.getUserByEmail(user_email);
       AuthServiceInstance.loginConfirm(account, password);
-      const token = await AuthServiceInstance.generateToken(account.user_id);
-      res.cookie('access_token', token, {
+      const accessToken = await AuthServiceInstance.generateAccessToken(
+        account.user_id,
+      );
+      const refreshToken = await AuthServiceInstance.generateRefreshToken();
+      AuthServiceInstance.updateRefreshToken(account.user_id, refreshToken);
+      res.cookie('access_token', accessToken, {
         httpOnly: true,
-        maxAge: 1000 * 600,
+        maxAge: 1000 * 60 * 60 * 24 * 7,
       });
-      res.body = account;
-      return res.json(res.body);
+      res.status(200).send({
+        data: {
+          refreshToken,
+        },
+      });
     }),
   );
 
+  //로그아웃
   route.post('/logout', async (req, res) => {
     res.clearCookie('access_token');
     res.status(200).json('로그아웃 성공');
