@@ -16,8 +16,14 @@ const isAuth = wrapAsyncError(async (req, res, next) => {
     const refreshToken = req.headers.refresh;
     const decoded = verifyToken(accessToken);
     const userID = jwt.decode(accessToken).user_id;
+    const user = await models.User.findById(userID, ['refresh_token']);
 
-    console.log(decoded);
+    //로그인이 되어있는지 확인
+    if (user.refresh_token === null) {
+      throw new CustomError('Json Web Token Error', '🔥 Login required', 401);
+    }
+
+    //console.log(decoded);
 
     //AccessToken이 만료된 경우
     if (decoded.message == 'jwt expired') {
@@ -32,7 +38,7 @@ const isAuth = wrapAsyncError(async (req, res, next) => {
       //RefreshToken이 헤더에 포함된 경우
       const decodedRefreshToken = verifyToken(refreshToken);
       //console.log(decodedRefreshToken, userID);
-      const user = await models.User.findById(userID, ['refresh_token']); //user db에 저장된 refresh token
+      //const user = await models.User.findById(userID, ['refresh_token']); //user db에 저장된 refresh token
 
       //RefreshToken이 만료된 경우
       if (decodedRefreshToken.message == 'jwt expired') {
@@ -48,13 +54,13 @@ const isAuth = wrapAsyncError(async (req, res, next) => {
         //RefreshToken이 올바른 경우
         if (refreshToken === user.refresh_token) {
           const newAccessToken = await generateToken({ user_id: userID });
-          res.cookie('access_token', newAccessToken, {
+          res.cookie('refresh_token', refreshToken, {
             httpOnly: true,
-            maxAge: 1000 * 60 * 60 * 24 * 7,
+            maxAge: 1000 * 60 * 60 * 24 * 14,
           });
           return res.status(200).send({
             data: {
-              refreshToken,
+              access_token: newAccessToken,
             },
           });
         }
