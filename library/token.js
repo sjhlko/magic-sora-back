@@ -3,7 +3,7 @@ import config from '../config/index.js';
 
 export function generateToken(payload, secret, expireTime) {
   const jwtSecret = secret || config.jwtSecret;
-  const expireIn = expireTime || '600s';
+  const expireIn = expireTime || '6s';
 
   return new Promise((resolve, reject) => {
     jwt.sign(
@@ -35,7 +35,7 @@ export const verifyToken = (token, secret) => {
 
 export function refreshToken(secret, expireTime) {
   const jwtSecret = secret || config.jwtSecret;
-  const expireIn = expireTime || '14d';
+  const expireIn = expireTime || '14s';
   return jwt.sign({}, jwtSecret, {
     algorithm: 'HS256',
     expiresIn: expireIn,
