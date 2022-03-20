@@ -1,6 +1,6 @@
 import { Model, DataTypes, Op } from 'sequelize';
 import sequelize from './index.js';
-import { generateToken, hashPassword } from '../library/index.js';
+import { hashPassword } from '../library/index.js';
 
 export class User extends Model {
   static associate(models) {
@@ -90,13 +90,6 @@ export class User extends Model {
       order: [['register_date', 'ASC']],
     });
   }
-
-  static async generateToken() {
-    const payload = {
-      user_id: this.user_id,
-    };
-    return generateToken(payload, 'user');
-  }
 }
 
 User.init(
@@ -135,6 +128,10 @@ User.init(
       allowNull: true,
     },
     profile_pic_url: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    refresh_token: {
       type: DataTypes.STRING(255),
       allowNull: true,
     },

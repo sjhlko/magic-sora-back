@@ -4,7 +4,6 @@ import { wrapAsyncError } from '../../library/index.js';
 import { AuthService } from '../../services/auth.js';
 import middlewares from '../middlewares/index.js';
 const AuthServiceInstance = new AuthService();
-import Joi from 'joi';
 const route = Router();
 
 export default app => {
@@ -18,52 +17,51 @@ export default app => {
     middlewares.isNicknameExists,
     wrapAsyncError(async (req, res) => {
       console.log(req.body);
-      let account = null;
-      account = await AuthServiceInstance.localRegister(req.body);
-      let token = null;
-      token = await AuthServiceInstance.generateToken();
-      res.cookie('access_token', token, {
+      const account = await AuthServiceInstance.localRegister(req.body);
+      const accessToken = await AuthServiceInstance.generateAccessToken(
+        account.user_id,
+      );
+      const refreshToken = await AuthServiceInstance.generateRefreshToken();
+      AuthServiceInstance.updateRefreshToken(account.user_id, refreshToken);
+      res.cookie('access_token', accessToken, {
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 7,
       });
-      res.body = account;
-      return res.json(res.body);
+      res.status(200).send({
+        data: {
+          refreshToken,
+        },
+      });
     }),
   );
 
   route.post(
+    //로컬 로그인
     '/login/local',
     wrapAsyncError(async (req, res) => {
       const { user_email, password } = req.body;
-      let account = null;
-      account = await AuthServiceInstance.getUserByEmail(user_email);
-      if (!account) {
-        //가입여부 확인
-        return res.json('가입되어있지 않은 이메일');
-      } else if (
-        //비밀번호 비교
-        !AuthServiceInstance.validatePassword(password, account.password)
-      ) {
-        res.status = 403;
-        return res.json('비밀번호 오류');
-      }
-      let token = null;
-      token = await AuthServiceInstance.generateToken();
-      res.cookie('access_token', token, {
+      const account = await AuthServiceInstance.getUserByEmail(user_email);
+      AuthServiceInstance.loginConfirm(account, password);
+      const accessToken = await AuthServiceInstance.generateAccessToken(
+        account.user_id,
+      );
+      const refreshToken = await AuthServiceInstance.generateRefreshToken();
+      AuthServiceInstance.updateRefreshToken(account.user_id, refreshToken);
+      res.cookie('access_token', accessToken, {
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 7,
       });
-      res.body = account;
-      return res.json(res.body);
+      res.status(200).send({
+        data: {
+          refreshToken,
+        },
+      });
     }),
   );
 
+  //로그아웃
   route.post('/logout', async (req, res) => {
-    res.cookie('access_token', null, {
-      maxAge: 0,
-      httpOnly: true,
-    });
-    res.status = 204;
-    return res.json('logout');
+    res.clearCookie('access_token');
+    res.status(200).json('로그아웃 성공');
   });
 };

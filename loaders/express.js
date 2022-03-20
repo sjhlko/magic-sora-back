@@ -4,6 +4,7 @@ import cors from 'cors';
 import route from '../api/index.js';
 import config from '../config/index.js';
 import logger from './logger.js';
+import cookieParser from 'cookie-parser';
 
 export default app => {
   const corsOptions = {
@@ -14,6 +15,7 @@ export default app => {
     ':remote-addr - :remote-user ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"';
   const morganFormat = process.env.NODE_ENV !== 'production' ? 'dev' : combined;
 
+  app.use(cookieParser());
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
   app.use(cors(corsOptions));

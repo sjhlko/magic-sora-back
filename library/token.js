@@ -10,6 +10,7 @@ export function generateToken(payload, secret, expireTime) {
       payload,
       jwtSecret,
       {
+        algorithm: 'HS256',
         expiresIn: expireIn,
       },
       (error, token) => {
@@ -21,6 +22,22 @@ export function generateToken(payload, secret, expireTime) {
 }
 
 export const verifyToken = (token, secret) => {
-  const jwtSecret = secret || config.jwtSecret;
-  return jwt.verify(token, jwtSecret);
+  try {
+    const jwtSecret = secret || config.jwtSecret;
+    return jwt.verify(token, jwtSecret);
+  } catch (err) {
+    return {
+      ok: false,
+      message: err.message,
+    };
+  }
 };
+
+export function refreshToken(secret, expireTime) {
+  const jwtSecret = secret || config.jwtSecret;
+  const expireIn = expireTime || '14d';
+  return jwt.sign({}, jwtSecret, {
+    algorithm: 'HS256',
+    expiresIn: expireIn,
+  });
+}
