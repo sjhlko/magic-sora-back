@@ -102,10 +102,10 @@ export default app => {
           //RefreshToken이 올바른 경우
           if (refreshToken === user.refresh_token) {
             const newAccessToken = await generateToken({ user_id: userID });
-            res.cookie('refresh_token', refreshToken, {
-              httpOnly: true,
-              maxAge: 1000 * 60 * 60 * 24 * 14,
-            });
+            // res.cookie('refresh_token', refreshToken, {
+            //   httpOnly: true,
+            //   maxAge: 1000 * 60 * 60 * 24 * 14,
+            // });
             return res.status(200).send({
               data: {
                 access_token: newAccessToken,
