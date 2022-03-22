@@ -22,6 +22,12 @@ export class VoteByUser extends Model {
       where: [{ user_id: id.user }, { post_id: id.post }],
     });
   }
+
+  static async getChoiceScore(id) {
+    return await this.findAll({
+      where: [{ post_id: id.post }, { choice_id: id.choice }],
+    });
+  }
 }
 
 VoteByUser.init(

@@ -5,7 +5,23 @@ export class ChoiceService {
   constructor() {}
 
   // 선택지 투표 순위대로 보여줌
-  async getVoteResultAll(postId) {}
+  async getVoteResultAll(postId) {
+    const post = await models.Post.getPostById(postId);
+    const choices = await post.getChoices();
+
+    let rank = choices.map(async choice => {
+      const choiceId = choice.choice_id;
+      const votes = await models.VoteByUser.getChoiceScore({
+        post: postId,
+        choice: choiceId,
+      });
+      return { choiceId: choiceId, score: votes.length };
+    });
+    rank = await Promise.all(rank);
+    rank = rank.sort((a, b) => b.score - a.score);
+
+    return rank;
+  }
 
   // 해당 id 선택지 투표 현황 (mbit, gender, age)
   async getVoteResultOne(userId, postId, choiceId) {}
