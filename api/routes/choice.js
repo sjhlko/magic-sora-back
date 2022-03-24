@@ -20,23 +20,6 @@ export default app => {
     }),
   );
 
-  // 개별 선택지 투표 결과 조회
-  route.get(
-    '/:postId/:choiceId',
-    middlewares.isPostIdValid,
-    wrapAsyncError(async (req, res) => {
-      const userId = req.user_id;
-      const { postId, choiceId } = req.params;
-      const voteResult = await ChoiceServiceInstance.getVoteResultOne(
-        userId,
-        postId,
-        choiceId,
-      );
-
-      res.json(voteResult);
-    }),
-  );
-
   // 선택지 투표
   route.post(
     '/:postId',
