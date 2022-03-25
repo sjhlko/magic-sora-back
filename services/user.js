@@ -58,6 +58,7 @@ export class UserService {
 
     await models.InterestedTag.deleteAllTags(id);
     await models.LikeByUser.deleteAllLikes(id);
+    await models.VoteByUser.deleteUserVote(id);
     await user.destroy(id);
   }
 

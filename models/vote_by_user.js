@@ -17,6 +17,12 @@ export class VoteByUser extends Model {
     });
   }
 
+  static async deleteUserVote(id) {
+    await this.destroy({
+      where: { user_id: id },
+    });
+  }
+
   static async getUserVote(id) {
     return await this.findOne({
       where: [{ user_id: id.user }, { post_id: id.post }],
