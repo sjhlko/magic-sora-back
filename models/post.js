@@ -12,6 +12,10 @@ export class Post extends Model {
       foreignKey: 'post_id',
       sourceKey: 'post_id',
     });
+    this.hasMany(models.VoteByUser, {
+      foreignKey: 'post_id',
+      sourceKey: 'post_id',
+    });
 
     this.belongsTo(models.User, {
       foreignKey: 'user_id',
@@ -22,95 +26,100 @@ export class Post extends Model {
       through: models.VoteByUser,
       foreignKey: 'post_id',
     });
-
-    this.hasMany(models.VoteByUser, {
-      foreignKey : 'post_id', sourceKey: 'post_id'
-    });
-
-    this.belongsToMany(models.NonUser, {
-      through: models.VoteByNonUser,
-      foreignKey: 'post_id',
-    });
     this.belongsToMany(models.Tag, {
       through: models.TagOfPost,
       foreignKey: 'post_id',
     });
   }
-  
-  static async searchPostTitle(search){
+
+  static async searchPostTitle(search) {
     return await models.Post.findAll({
-      include : [{
+      include: [
+        {
           model: models.User,
-      }],
+        },
+      ],
       attributes: ['post_id', 'user_id', 'post_title', 'register_date'],
-      where: { post_title : {[Op.like]: search}},
-  })
+      where: { post_title: { [Op.like]: search } },
+    });
   }
-  static async searchPostContent(search){
+  static async searchPostContent(search) {
     return await models.Post.findAll({
-      include : [{
+      include: [
+        {
           model: models.User,
-      }],
+        },
+      ],
       attributes: ['post_id', 'user_id', 'post_title', 'register_date'],
-      where: { post_content : {[Op.like]: search}},
-    })
+      where: { post_content: { [Op.like]: search } },
+    });
   }
-  static async getPostById(id){
+  static async getPostById(id) {
     return await this.findOne({
-      where: {post_id : id},
-    })
+      where: { post_id: id },
+    });
   }
-  static async getLatestPost(){
+  static async getLatestPost() {
     return await this.findOne({
       attribues: ['post_id'],
-      order:[['post_id', 'DESC']],
-      limit: 1
-    })
+      order: [['post_id', 'DESC']],
+      limit: 1,
+    });
   }
   static async deletePost(id) {
     await this.destroy({
       where: { post_id: id },
     });
   }
-  static async getNewPost(){
+  static async getNewPost() {
     return await this.findAll({
       attributes: ['post_id', 'user_id', 'post_title', 'register_date'],
-      order : [['post_id', 'DESC']]
-    })
+      order: [['post_id', 'DESC']],
+    });
   }
-  static async getDeadlinePost(){
+  static async getDeadlinePost() {
     return await this.findAll({
       attributes: ['post_id', 'user_id', 'post_title', 'register_date'],
-      where: { finish_date : {[Op.gt]: new Date()}},
-      order : [['post_id', 'DESC']]
-    })
+      where: { finish_date: { [Op.gt]: new Date() } },
+      order: [['post_id', 'DESC']],
+    });
   }
-  static async getEndPost(){
+  static async getEndPost() {
     return await this.findAll({
       attributes: ['post_id', 'user_id', 'post_title', 'register_date'],
-      where: { finish_date : {[Op.lt]:new Date()}},
-      order : [['post_id', 'DESC']]
-    })
+      where: { finish_date: { [Op.lt]: new Date() } },
+      order: [['post_id', 'DESC']],
+    });
   }
-  static async getFavTagPost(post_id){
+  static async getFavTagPost(post_id) {
     return await this.findAll({
       attributes: ['post_id', 'user_id', 'post_title', 'register_date'],
-      where: { post_id : post_id },
-      order : [['post_id', 'DESC']]
-    })
+      where: { post_id: post_id },
+      order: [['post_id', 'DESC']],
+    });
   }
-  static async getHotPost(){
+  static async getHotPost() {
     return await this.findAll({
       attributes: {
-        include: [[sequelize.fn('COUNT', sequelize.col('VoteByUsers.post_id')), 'count']],
+        include: [
+          [
+            sequelize.fn('COUNT', sequelize.col('VoteByUsers.post_id')),
+            'count',
+          ],
+        ],
       },
-      include : [{
-        model: models.VoteByUser,
-        attributes: [],
-      }],
-      group : ['VoteByUsers.post_id'],
-      order : [[sequelize.col('count'), 'DESC'], ['post_id', 'DESC']]
-    })
+      include: [
+        {
+          model: models.VoteByUser,
+          attributes: [],
+        },
+      ],
+      group: ['VoteByUsers.post_id'],
+      order: [
+        [sequelize.col('count'), 'DESC'],
+        ['post_id', 'DESC'],
+      ],
+    });
   }
 
   async getPostInfo(authorName, profile) {
@@ -141,7 +150,7 @@ export class Post extends Model {
       commentNum: comments.length,
     };
   }
-  
+
   async getPostDetailInfo(authorName, profile) {
     let tags = await this.getTags({
       attributes: ['tag_name'],
@@ -151,15 +160,15 @@ export class Post extends Model {
     });
 
     let choices = await this.getChoices();
-    choices.map(choice =>{
-      return{
+    choices.map(choice => {
+      return {
         id: choice.choice_id,
         choice_content: choice.choice_content,
-        photo_url: choice.photo_url
-      }
-    })
+        photo_url: choice.photo_url,
+      };
+    });
 
-    let isFinished = new Date(this.finish_date) < new Date()
+    let isFinished = new Date(this.finish_date) < new Date();
 
     return {
       id: this.post_id,
@@ -171,7 +180,7 @@ export class Post extends Model {
       author: authorName,
       tags: tags,
       choice: choices,
-      isFinished: isFinished
+      isFinished: isFinished,
     };
   }
 }
@@ -222,11 +231,6 @@ Post.init(
         unique: true,
         using: 'BTREE',
         fields: [{ name: 'post_id' }],
-      },
-      {
-        name: 'FK_user_TO_post_1',
-        using: 'BTREE',
-        fields: [{ name: 'user_id' }],
       },
     ],
   },

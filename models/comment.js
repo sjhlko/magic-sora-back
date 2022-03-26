@@ -7,10 +7,6 @@ export class Comment extends Model {
       through: models.LikeByUser,
       foreignKey: 'comment_id',
     });
-    this.belongsToMany(models.NonUser, {
-      through: models.LikeByNonUser,
-      foreignKey: 'comment_id',
-    });
 
     this.belongsTo(models.Post, {
       foreignKey: 'post_id',
@@ -132,16 +128,6 @@ Comment.init(
         unique: true,
         using: 'BTREE',
         fields: { name: 'comment_id' },
-      },
-      {
-        name: 'FK_post_TO_comment_1',
-        using: 'BTREE',
-        fields: { name: 'post_id' },
-      },
-      {
-        name: 'FK_user_TO_comment_1',
-        using: 'BTREE',
-        fields: { name: 'user_id' },
       },
     ],
   },

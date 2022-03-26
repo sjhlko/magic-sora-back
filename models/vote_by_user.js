@@ -77,11 +77,6 @@ VoteByUser.init(
         using: 'BTREE',
         fields: [{ name: 'user_id' }, { name: 'post_id' }],
       },
-      {
-        name: 'FK_post_TO_vote_by_user_1',
-        using: 'BTREE',
-        fields: [{ name: 'post_id' }],
-      },
     ],
   },
 );

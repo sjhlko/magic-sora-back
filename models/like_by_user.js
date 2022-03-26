@@ -7,14 +7,14 @@ export class LikeByUser extends Model {
       where: { user_id: userId },
     });
   }
-  static async findLikes(user_id, post_id, comment_id){
+  static async findLikes(user_id, post_id, comment_id) {
     return await this.findOne({
-      where:{
+      where: {
         user_id: user_id,
         post_id: post_id,
-        comment_id: comment_id
-      }
-    })
+        comment_id: comment_id,
+      },
+    });
   }
 }
 
@@ -61,11 +61,6 @@ LikeByUser.init(
           { name: 'post_id' },
           { name: 'comment_id' },
         ],
-      },
-      {
-        name: 'FK_comment_TO_like_by_user_2',
-        using: 'BTREE',
-        fields: [{ name: 'comment_id' }],
       },
     ],
   },

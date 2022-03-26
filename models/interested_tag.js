@@ -50,11 +50,6 @@ InterestedTag.init(
         using: 'BTREE',
         fields: [{ name: 'tag_id' }, { name: 'user_id' }],
       },
-      {
-        name: 'FK_user_TO_interested_tag_1',
-        using: 'BTREE',
-        fields: [{ name: 'user_id' }],
-      },
     ],
   },
 );
