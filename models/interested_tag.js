@@ -7,12 +7,6 @@ export class InterestedTag extends Model {
       where: { user_id: userId },
     });
   }
-
-  static async deleteOneTag(userId, tagId) {
-    await this.destroy({
-      where: [{ user_id: userId }, { tag_id: tagId }],
-    });
-  }
 }
 
 InterestedTag.init(
@@ -49,11 +43,6 @@ InterestedTag.init(
         unique: true,
         using: 'BTREE',
         fields: [{ name: 'tag_id' }, { name: 'user_id' }],
-      },
-      {
-        name: 'FK_user_TO_interested_tag_1',
-        using: 'BTREE',
-        fields: [{ name: 'user_id' }],
       },
     ],
   },

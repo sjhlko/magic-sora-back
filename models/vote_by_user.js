@@ -17,6 +17,12 @@ export class VoteByUser extends Model {
     });
   }
 
+  static async deleteUserVote(id) {
+    await this.destroy({
+      where: { user_id: id },
+    });
+  }
+
   static async getUserVote(id) {
     return await this.findOne({
       where: [{ user_id: id.user }, { post_id: id.post }],
@@ -70,11 +76,6 @@ VoteByUser.init(
         unique: true,
         using: 'BTREE',
         fields: [{ name: 'user_id' }, { name: 'post_id' }],
-      },
-      {
-        name: 'FK_post_TO_vote_by_user_1',
-        using: 'BTREE',
-        fields: [{ name: 'post_id' }],
       },
     ],
   },

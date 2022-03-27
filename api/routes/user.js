@@ -112,31 +112,18 @@ export default app => {
     }),
   );
 
-  // 관심태그 추가
-  route.post(
+  // 관심태그 목록 수정
+  route.patch(
     '/mytags',
     middlewares.isAuth,
     middlewares.getCurrentUserId,
     wrapAsyncError(async (req, res) => {
-      const userId = req.user_id;
-      const tagId = req.body;
-      await userServiceInstance.addUserTag(userId, tagId);
+      const id = req.user_id;
+      const tagIds = req.body;
 
-      return res.status(201).json({ user_id: userId, tag_id: tagId });
-    }),
-  );
+      const userTags = await userServiceInstance.updateUserTag(id, tagIds);
 
-  // 관심태그 삭제
-  route.delete(
-    '/mytags',
-    middlewares.isAuth,
-    middlewares.getCurrentUserId,
-    wrapAsyncError(async (req, res) => {
-      const userId = req.user_id;
-      const tagId = req.body;
-      await userServiceInstance.deleteUserTag(userId, tagId);
-
-      return res.sendStatus(204);
+      return res.json(userTags);
     }),
   );
 
