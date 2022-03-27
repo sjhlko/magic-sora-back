@@ -4,6 +4,7 @@ import user from './routes/user.js';
 import auth from './routes/auth.js';
 import choice from './routes/choice.js';
 import tags from './routes/tags.js';
+import comments from './routes/comments.js';
 
 export default () => {
   const app = Router();
@@ -12,5 +13,6 @@ export default () => {
   posts(app);
   choice(app);
   tags(app);
+  comments(app);
   return app;
 };

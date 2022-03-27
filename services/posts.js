@@ -7,12 +7,20 @@ import {
 } from '../library/index.js';
 
 export class PostService{
-  async getPostList(type, id){ //query문에서 받아온 것 new, deadline, end ...
+  async getPostList(type, id){
     let posts;
-    if(type == 'new') {posts = await models.Post.getNewPost();}
-    else if(type == 'deadline') {posts = await models.Post.getDeadlinePost();}
-    else if(type == 'end') {posts = await models.Post.getEndPost();}
-    else if(type == 'hot') {posts = await models.Post.getHotPost();}
+    if(type == 'new') {
+      posts = await models.Post.getNewPost();
+    }
+    else if(type == 'deadline') {
+      posts = await models.Post.getDeadlinePost();
+    }
+    else if(type == 'end') {
+      posts = await models.Post.getEndPost();
+    }
+    else if(type == 'hot') {
+      posts = await models.Post.getHotPost();
+    }
     else if(type == 'favtag'){
       const user = await models.User.findById(id, ['user_id']);
       let tags = await user.getTags();
@@ -27,10 +35,11 @@ export class PostService{
       posts= await models.Post.getFavTagPost(post_id);
     }
 
-    posts = posts.map(async (post)=>{
-      const author = await models.User.findById(post.user_id, ['nickname']);
+    posts = posts.map(async post =>{
+      const author = await models.User.findById(post.user_id, ['nickname', 'profile_pic_url']);
       const authorName = author ? author.nickname : '알 수 없음';
-      return post.getPostInfo(authorName);
+      const profile = author.profile_pic_url
+      return post.getPostInfo(authorName, profile);
     })
     posts = await Promise.all(posts);
 
@@ -46,13 +55,15 @@ export class PostService{
   }
 
   async searchPost(option, search){
-    let user, posts;
+    let posts;
     search = '%'+search.replace(' ', '%')+'%';
     if(option == 'nickname'){
-      user = await models.User.findByNickname(search, ['user_id']);
+      const author = await models.User.findByNickname(search, ['user_id', 'nickname', 'profile_url_pic']);
+      const authorName =  author ? author.nickname : '알 수 없음';
+      const profile = author.profile_url_pic
       posts = await user.getPosts();
       posts = posts.map(async (post)=>{
-        return post.getPostInfo(user)
+        return post.getPostInfo(authorName, profile)
       })
     }
     else{
@@ -63,9 +74,10 @@ export class PostService{
         posts = await models.Post.searchPostContent(search) 
       }
       posts = posts.map(async (post)=>{
-        const author = await models.User.findById(post.user_id, ['nickname']);
+        const author = await models.User.findById(post.user_id, ['nickname', 'profile_pic_url']);
+        const profile = author.profile_pic_url
         const authorName = author ? author.nickname : '알 수 없음';
-        return post.getPostInfo(authorName);
+        return post.getPostInfo(authorName, profile);
       })
     }
     posts = await Promise.all(posts);
@@ -73,10 +85,11 @@ export class PostService{
   }
   async getPostDetail(id){
     let post = await models.Post.getPostById(id);
-    const author = await models.User.findById(post.user_id, ['nickname']);
+    const author = await models.User.findById(post.user_id, ['nickname', 'profile_pic_url']);
     const authorName = author ? author.nickname : '알 수 없음';
+    const profile = author.profile_pic_url
 
-    post = post.getPostDetailInfo(authorName);
+    post = post.getPostDetailInfo(authorName, profile);
     return post;
   }
 
@@ -96,7 +109,7 @@ export class PostService{
      //tag 입력 요소가 1개면 배열이 아니므로 배열로 바꿔주는 코드
      //tag 입력 요소는 tag_id가 오도록 한다.
     let tagArray=[];
-    if(!Array.isArray(data.tag)){ tagArray = Array.from (data.tag); }
+    if(!Array.isArray(data.tag)){ tagArray.push(data.tag) }
     else { tagArray = data.tag; }
 
     //TagOfPost에 post와 관련된 tag 등록
@@ -108,10 +121,10 @@ export class PostService{
     })
 
     //Choice에 post와 관련된 choice 등록
-    //만약 사진파일갯수 < 선택지 갯수일 경우 파일 나머지를 null로 채워야함
+    //만약 사진파일갯수 < 선택지 갯수일 경우, 사진파일 갯수가 0인 경우, 파일 나머지를 null로 채워야함
     let filename=[];
     data.choice.forEach(async(item, index)=>{
-      if(files[index]) filename.push(files[index].filename)
+      if(files && files[index]) filename.push(files[index].filename)
       else filename.push(null);
 
       await models.Choice.create({

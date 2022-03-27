@@ -57,7 +57,6 @@ export class Post extends Model {
   }
   static async getPostById(id){
     return await this.findOne({
-      attributes: ['post_id'],
       where: {post_id : id},
     })
   }
@@ -110,11 +109,11 @@ export class Post extends Model {
         attributes: [],
       }],
       group : ['VoteByUsers.post_id'],
-      order : [[sequelize.col('count'), 'DESC']]
+      order : [[sequelize.col('count'), 'DESC'], ['post_id', 'DESC']]
     })
   }
 
-  async getPostInfo(authorName) {
+  async getPostInfo(authorName, profile) {
     let tags = await this.getTags({
       attributes: ['tag_name'],
     });
@@ -134,6 +133,7 @@ export class Post extends Model {
     return {
       id: this.post_id,
       title: this.post_title,
+      profile: profile,
       registerDate: this.register_date,
       author: authorName,
       tags: tags,
@@ -141,7 +141,8 @@ export class Post extends Model {
       commentNum: comments.length,
     };
   }
-  async getPostDetailInfo(authorName) {
+  
+  async getPostDetailInfo(authorName, profile) {
     let tags = await this.getTags({
       attributes: ['tag_name'],
     });
@@ -150,22 +151,27 @@ export class Post extends Model {
     });
 
     let choices = await this.getChoices();
-    let choice_content = [], photo_url = [];
-    choices.forEach((item)=>{
-      choice_content.push(item.choice_content);
-      photo_url.push(item.photo_url);
+    choices.map(choice =>{
+      return{
+        id: choice.choice_id,
+        choice_content: choice.choice_content,
+        photo_url: choice.photo_url
+      }
     })
+
+    let isFinished = new Date(this.finish_date) < new Date()
 
     return {
       id: this.post_id,
       title: this.post_title,
+      profile: profile,
       content: this.post_content,
       registerDate: this.register_date,
       finishDate: this.finish_date,
       author: authorName,
       tags: tags,
-      choice_content: choice_content,
-      photo_url: photo_url
+      choice: choices,
+      isFinished: isFinished
     };
   }
 }
