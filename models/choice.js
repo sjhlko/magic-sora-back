@@ -61,11 +61,6 @@ Choice.init(
         using: 'BTREE',
         fields: [{ name: 'choice_id' }, { name: 'post_id' }],
       },
-      {
-        name: 'FK_post_TO_choice_1',
-        using: 'BTREE',
-        fields: [{ name: 'post_id' }],
-      },
     ],
   },
 );

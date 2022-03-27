@@ -23,9 +23,6 @@ export class ChoiceService {
     return rank;
   }
 
-  // 해당 id 선택지 투표 현황 (mbit, gender, age)
-  async getVoteResultOne(userId, postId, choiceId) {}
-
   // 해당 id 선택지 투표
   async voteChoice(userId, postId, choiceId) {
     const isVoted = await models.VoteByUser.getUserVote({

@@ -6,32 +6,22 @@ const route = Router();
 const ChoiceServiceInstance = new ChoiceService();
 
 export default app => {
-  app.use('/posts/options', route);
+  app.use(
+    '/posts/:id/options',
+    (req, res, next) => {
+      req.post_id = req.params.id;
+      next();
+    },
+    route,
+  );
 
   // 전체 투표 결과 조회
   route.get(
-    '/:postId',
+    '/',
     middlewares.isPostIdValid,
     wrapAsyncError(async (req, res) => {
-      const postId = req.params.postId;
+      const postId = req.post_id;
       const voteResult = await ChoiceServiceInstance.getVoteResultAll(postId);
-
-      res.json(voteResult);
-    }),
-  );
-
-  // 개별 선택지 투표 결과 조회
-  route.get(
-    '/:postId/:choiceId',
-    middlewares.isPostIdValid,
-    wrapAsyncError(async (req, res) => {
-      const userId = req.user_id;
-      const { postId, choiceId } = req.params;
-      const voteResult = await ChoiceServiceInstance.getVoteResultOne(
-        userId,
-        postId,
-        choiceId,
-      );
 
       res.json(voteResult);
     }),
@@ -39,13 +29,13 @@ export default app => {
 
   // 선택지 투표
   route.post(
-    '/:postId',
+    '/',
     middlewares.isAuth,
     middlewares.getCurrentUserId,
     middlewares.isPostIdValid,
     wrapAsyncError(async (req, res) => {
       const userId = req.user_id;
-      const postId = req.params.postId;
+      const postId = req.post_id;
       const choiceId = req.body.choice_id;
       await ChoiceServiceInstance.voteChoice(userId, postId, choiceId);
 

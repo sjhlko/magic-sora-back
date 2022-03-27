@@ -1,5 +1,5 @@
 import { Model, DataTypes } from 'sequelize';
-import  sequelize from './index.js';
+import sequelize from './index.js';
 export class TagOfPost extends Model {
   static async deleteTagOfPost(id) {
     await this.destroy({
@@ -42,11 +42,6 @@ TagOfPost.init(
         unique: true,
         using: 'BTREE',
         fields: [{ name: 'post_id' }, { name: 'tag_id' }],
-      },
-      {
-        name: 'FK_tag_TO_tag_of_post_1',
-        using: 'BTREE',
-        fields: [{ name: 'tag_id' }],
       },
     ],
   },
