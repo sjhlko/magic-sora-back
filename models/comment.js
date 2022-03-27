@@ -1,13 +1,10 @@
-import { Model, DataTypes } from 'sequelize';
+import { Model, DataTypes, Op } from 'sequelize';
 import sequelize from './index.js';
+import { models } from './init-models.js';
 export class Comment extends Model {
   static associate(models) {
     this.belongsToMany(models.User, {
       through: models.LikeByUser,
-      foreignKey: 'comment_id',
-    });
-    this.belongsToMany(models.NonUser, {
-      through: models.LikeByNonUser,
       foreignKey: 'comment_id',
     });
 
@@ -20,10 +17,63 @@ export class Comment extends Model {
       targetKey: 'user_id',
     });
   }
+  static async findById(id){
+    return await this.findOne({
+      where: {comment_id: id}
+    })
+  }
   static async deleteComment(id) {
     await this.destroy({
       where: { post_id: id },
     });
+  }
+  
+  static async addLikes(id){
+    await this.findOne({
+      where: {comment_id : id}
+    }).then(comment =>{
+      return comment.increment('number_of_like', {by: 1})
+    })
+  }
+
+  static async deleteLikes(id){
+    await this.findOne({
+      where: {comment_id: id}
+    }).then(comment =>{
+      return comment.decrement('number_of_like', {by: 1})
+    })
+  }
+  static async getBestComments(id){
+    return await this.findAll({
+      where: { post_id: id, number_of_like: {[Op.gt]: 0}},
+      order: [['number_of_like', 'DESC']],
+      limit: 3
+    });
+  }
+  static async getRestComments(post_id, comment_id){
+    return await this.findAll({
+      where: {comment_id :{[Op.notIn]:comment_id}, post_id:post_id},
+      order: [['comment_id', 'DESC']]
+    })
+  }
+  async getCommentInfo(status){
+    const author = await models.User.findById(this.user_id, ['nickname', 'profile_pic_url']);
+    const voteNum = await models.VoteByUser.getUserVote({
+      user: this.user_id,
+      post: this.post_id
+    })
+    //DB에 투표안한사람들도 댓글 쓴 경우가 있어서 일단 임시방편
+    let choiceId = voteNum? voteNum.choice_id : 0
+    return{
+      id: this.comment_id,
+      choiceId: choiceId,
+      status: status,
+      author: author.nickname,
+      profile: author.profile_pic_url,
+      registerDate: this.register_date,
+      likes: this.number_of_like,
+      content: this.comment_content
+    }
   }
 }
 
@@ -78,16 +128,6 @@ Comment.init(
         unique: true,
         using: 'BTREE',
         fields: { name: 'comment_id' },
-      },
-      {
-        name: 'FK_post_TO_comment_1',
-        using: 'BTREE',
-        fields: { name: 'post_id' },
-      },
-      {
-        name: 'FK_user_TO_comment_1',
-        using: 'BTREE',
-        fields: { name: 'user_id' },
       },
     ],
   },

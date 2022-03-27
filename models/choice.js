@@ -7,6 +7,13 @@ export class Choice extends Model {
       targetKey: 'post_id',
     });
   }
+
+  static async findById(id) {
+    return await this.findOne({
+      where: [{ post_id: id.post }, { choice_id: id.choice }],
+    });
+  }
+
   static async deleteChoice(id) {
     await this.destroy({
       where: { post_id: id },
@@ -53,11 +60,6 @@ Choice.init(
         unique: true,
         using: 'BTREE',
         fields: [{ name: 'choice_id' }, { name: 'post_id' }],
-      },
-      {
-        name: 'FK_post_TO_choice_1',
-        using: 'BTREE',
-        fields: [{ name: 'post_id' }],
       },
     ],
   },
