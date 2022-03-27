@@ -27,10 +27,6 @@ LikeByNonUser.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
-      references: {
-        model: 'comment',
-        key: 'post_id',
-      },
     },
   },
   {
@@ -56,11 +52,7 @@ LikeByNonUser.init(
         using: 'BTREE',
         fields: [{ name: 'comment_id' }],
       },
-      {
-        name: 'FK_comment_TO_like_by_non_user_2',
-        using: 'BTREE',
-        fields: [{ name: 'post_id' }],
-      },
     ],
   },
 );
+

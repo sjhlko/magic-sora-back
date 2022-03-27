@@ -3,9 +3,18 @@ import sequelize from './index.js';
 
 export class LikeByUser extends Model {
   static async deleteAllLikes(userId) {
-    await this.destroy({
+    return await this.destroy({
       where: { user_id: userId },
     });
+  }
+  static async findLikes(user_id, post_id, comment_id){
+    return await this.findOne({
+      where:{
+        user_id: user_id,
+        post_id: post_id,
+        comment_id: comment_id
+      }
+    })
   }
 }
 
@@ -24,10 +33,6 @@ LikeByUser.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
-      references: {
-        model: 'comment',
-        key: 'post_id',
-      },
     },
     comment_id: {
       type: DataTypes.INTEGER,
@@ -56,11 +61,6 @@ LikeByUser.init(
           { name: 'post_id' },
           { name: 'comment_id' },
         ],
-      },
-      {
-        name: 'FK_comment_TO_like_by_user_1',
-        using: 'BTREE',
-        fields: [{ name: 'post_id' }],
       },
       {
         name: 'FK_comment_TO_like_by_user_2',
