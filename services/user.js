@@ -127,19 +127,17 @@ export class UserService {
     return user.Tags;
   }
 
-  async addUserTag(userId, tagId) {
+  async updateUserTag(userId, newTagIds) {
     const user = await models.User.findById(userId, ['user_id']);
-    let tags = tagId.map(async id => {
+
+    await models.InterestedTag.deleteAllTags(userId);
+
+    let newTags = newTagIds.map(async id => {
       return await models.Tag.findById(id.tag_id);
     });
-    tags = await Promise.all(tags);
+    newTags = await Promise.all(newTags);
 
-    await user.addTags(tags);
-  }
-
-  async deleteUserTag(userId, tagId) {
-    tagId.forEach(async id => {
-      await models.InterestedTag.deleteOneTag(userId, id.tag_id);
-    });
+    await user.addTags(newTags);
+    return newTags;
   }
 }

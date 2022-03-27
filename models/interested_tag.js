@@ -7,12 +7,6 @@ export class InterestedTag extends Model {
       where: { user_id: userId },
     });
   }
-
-  static async deleteOneTag(userId, tagId) {
-    await this.destroy({
-      where: [{ user_id: userId }, { tag_id: tagId }],
-    });
-  }
 }
 
 InterestedTag.init(
