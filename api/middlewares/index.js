@@ -5,6 +5,9 @@ import isUserIdValid from './isUserIdValid.js';
 import isPostIdValid from './isPostIdValid.js';
 import isEmailExists from './isEmailExists.js';
 import isNicknameExists from './isNicknameExists.js';
+import isCommentVisible from './isCommentVisible.js';
+import isLikesValid from './isLikesValid.js';
+import isDeleteValid from './isDeleteValid.js';
 
 export default {
   isAuth,
@@ -14,4 +17,7 @@ export default {
   isPostIdValid,
   isEmailExists,
   isNicknameExists,
+  isCommentVisible,
+  isLikesValid,
+  isDeleteValid,
 };
