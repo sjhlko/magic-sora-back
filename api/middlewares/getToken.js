@@ -4,15 +4,14 @@ import {
   CustomError,
 } from '../../library/index.js';
 
-const isAuth = wrapAsyncError(async (req, res, next) => {
+const getToken = wrapAsyncError(async (req, res, next) => {
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer') &&
     req.cookies['refresh']
   ) {
-    const accessToken = req.headers.authorization.split(' ')[1];
-    const decoded = verifyToken(accessToken);
-    req.accessToken_id = decoded.user_id;
+    req.accessToken = req.headers.authorization.split(' ')[1];
+    req.refreshToken = req.cookies['refresh'];
     next();
   } else {
     throw new CustomError(
@@ -23,4 +22,4 @@ const isAuth = wrapAsyncError(async (req, res, next) => {
   }
 });
 
-export default isAuth;
+export default getToken;
