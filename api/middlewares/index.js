@@ -8,6 +8,9 @@ import isNicknameExists from './isNicknameExists.js';
 import isCommentVisible from './isCommentVisible.js';
 import isLikesValid from './isLikesValid.js';
 import isDeleteValid from './isDeleteValid.js';
+import isLoginValid from './isPasswordValid.js';
+import isPasswordValid from './isPasswordValid.js';
+import getToken from './getToken.js';
 
 export default {
   isAuth,
@@ -20,4 +23,7 @@ export default {
   isCommentVisible,
   isLikesValid,
   isDeleteValid,
+  isLoginValid,
+  isPasswordValid,
+  getToken,
 };
