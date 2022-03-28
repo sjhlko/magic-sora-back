@@ -3,7 +3,7 @@ import config from '../config/index.js';
 
 export function generateToken(payload, secret, expireTime) {
   const jwtSecret = secret || config.jwtSecret;
-  const expireIn = expireTime || '6s';
+  const expireIn = expireTime || '600s';
 
   return new Promise((resolve, reject) => {
     jwt.sign(
@@ -22,20 +22,15 @@ export function generateToken(payload, secret, expireTime) {
 }
 
 export const verifyToken = (token, secret) => {
-  try {
+  {
     const jwtSecret = secret || config.jwtSecret;
     return jwt.verify(token, jwtSecret);
-  } catch (err) {
-    return {
-      ok: false,
-      message: err.message,
-    };
   }
 };
 
 export function refreshToken(secret, expireTime) {
   const jwtSecret = secret || config.jwtSecret;
-  const expireIn = expireTime || '14s';
+  const expireIn = expireTime || '14d';
   return jwt.sign({}, jwtSecret, {
     algorithm: 'HS256',
     expiresIn: expireIn,
