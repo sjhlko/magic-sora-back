@@ -2,7 +2,7 @@ import { models } from '../../models/init-models.js';
 import { wrapAsyncError, CustomError } from '../../library/index.js';
 
 const isEmailValid = wrapAsyncError(async (req, res, next) => {
-  const email = req.body.email;
+  const email = req.body.email || req.body.user_email;
   const user = await models.User.findByEmail(email, [
     'user_id',
     'user_email',

@@ -29,7 +29,7 @@ export class User extends Model {
     });
   }
 
-  static async localRegister(newUser) {
+  static async createUser(newUser) {
     return await this.create(newUser);
   }
 

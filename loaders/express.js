@@ -5,6 +5,7 @@ import route from '../api/index.js';
 import config from '../config/index.js';
 import logger from './logger.js';
 import cookieParser from 'cookie-parser';
+import nocache from 'nocache';
 
 export default app => {
   const corsOptions = {
@@ -16,6 +17,8 @@ export default app => {
   const morganFormat = process.env.NODE_ENV !== 'production' ? 'dev' : combined;
 
   app.use(cookieParser());
+  app.set('etag', false);
+  app.use(nocache());
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
   app.use(cors(corsOptions));

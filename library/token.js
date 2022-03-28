@@ -22,14 +22,9 @@ export function generateToken(payload, secret, expireTime) {
 }
 
 export const verifyToken = (token, secret) => {
-  try {
+  {
     const jwtSecret = secret || config.jwtSecret;
     return jwt.verify(token, jwtSecret);
-  } catch (err) {
-    return {
-      ok: false,
-      message: err.message,
-    };
   }
 };
 
