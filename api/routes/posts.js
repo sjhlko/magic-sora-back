@@ -60,32 +60,22 @@ export default app => {
   //게시판 상세 내용
   route.use(express.static(__dirname + '/public/images'))
   route.get('/:id', async(req, res)=>{
+    console.log('dfdfdf')
     const post_id = req.params.id;
     const postDetail = await postServiceInstance.getPostDetail(post_id);
+    console.log(JSON.stringify(postDetail))
     res.json(postDetail)
   })
 
-  //게시판 글쓰기 (프론트에 한글 파일명 되도록 utf-8 넣어야함)
-  const storage = multer.diskStorage({
-    destination: function(req, file, done){
-      done(null, "public/images/");
-    },
-    filename: function(req, file, done){
-      const ext = path.extname(file.originalname);
-      done(null, path.basename(file.originalname, ext)+Date.now()+ext);
-    }
-  });
-  const upload = multer({storage: storage});
+  //게시판 글쓰기
   route.post(
     '/', 
-    upload.array('image'),
     middlewares.isAuth,
     middlewares.getCurrentUserId,
     wrapAsyncError(async(req, res)=>{
       const data = req.body;
-      const files = req.files;
       const user = req.user_id;
-      await postServiceInstance.insertPost(data, files, user);
+      await postServiceInstance.insertPost(data, user);
       return res.sendStatus(200);
   }))
 }

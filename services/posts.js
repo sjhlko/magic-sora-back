@@ -38,7 +38,7 @@ export class PostService{
     posts = posts.map(async post =>{
       const author = await models.User.findById(post.user_id, ['nickname', 'profile_pic_url']);
       const authorName = author ? author.nickname : '알 수 없음';
-      const profile = author.profile_pic_url
+      const profile = author? author.profile_pic_url : 'default image'
       return post.getPostInfo(authorName, profile);
     })
     posts = await Promise.all(posts);
@@ -58,10 +58,10 @@ export class PostService{
     let posts;
     search = '%'+search.replace(' ', '%')+'%';
     if(option == 'nickname'){
-      const author = await models.User.findByNickname(search, ['user_id', 'nickname', 'profile_url_pic']);
+      const author = await models.User.findByNickname(search, ['user_id', 'nickname', 'profile_pic_url']);
       const authorName =  author ? author.nickname : '알 수 없음';
-      const profile = author.profile_url_pic
-      posts = await user.getPosts();
+      const profile = author? author.profile_pic_url : 'default image'
+      posts = await author.getPosts();
       posts = posts.map(async (post)=>{
         return post.getPostInfo(authorName, profile)
       })
@@ -75,7 +75,7 @@ export class PostService{
       }
       posts = posts.map(async (post)=>{
         const author = await models.User.findById(post.user_id, ['nickname', 'profile_pic_url']);
-        const profile = author.profile_pic_url
+        const profile = author? author.profile_pic_url : 'default image'
         const authorName = author ? author.nickname : '알 수 없음';
         return post.getPostInfo(authorName, profile);
       })
@@ -87,13 +87,13 @@ export class PostService{
     let post = await models.Post.getPostById(id);
     const author = await models.User.findById(post.user_id, ['nickname', 'profile_pic_url']);
     const authorName = author ? author.nickname : '알 수 없음';
-    const profile = author.profile_pic_url
+    const profile = author? author.profile_pic_url : 'default image'
 
     post = post.getPostDetailInfo(authorName, profile);
     return post;
   }
 
-  async insertPost(data, files, user_id){
+  async insertPost(data, user_id){
     const register_date = new Date();
     await models.Post.create({
       user_id: user_id,
@@ -106,11 +106,9 @@ export class PostService{
     const getPostId = await models.Post.getLatestPost();
     let post_id = getPostId.post_id;
 
-     //tag 입력 요소가 1개면 배열이 아니므로 배열로 바꿔주는 코드
-     //tag 입력 요소는 tag_id가 오도록 한다.
-    let tagArray=[];
-    if(!Array.isArray(data.tag)){ tagArray.push(data.tag) }
-    else { tagArray = data.tag; }
+    let tagArray = new Array()
+    if(Array.isArray(data.tag)) tagArray = data.tag
+    else tagArray.push(data.tag)
 
     //TagOfPost에 post와 관련된 tag 등록
     tagArray.forEach(async (item)=>{
@@ -121,17 +119,13 @@ export class PostService{
     })
 
     //Choice에 post와 관련된 choice 등록
-    //만약 사진파일갯수 < 선택지 갯수일 경우, 사진파일 갯수가 0인 경우, 파일 나머지를 null로 채워야함
-    let filename=[];
+    //choice 배열 객체로 보내줘
     data.choice.forEach(async(item, index)=>{
-      if(files && files[index]) filename.push(files[index].filename)
-      else filename.push(null);
-
       await models.Choice.create({
         choice_id: index + 1,
         post_id: post_id,
         choice_content: item,
-        photo_url: filename[index],
+        photo_url: item.photo_url,
       })
     })
   }
