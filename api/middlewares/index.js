@@ -11,6 +11,7 @@ import isDeleteValid from './isDeleteValid.js';
 import isLoginValid from './isPasswordValid.js';
 import isPasswordValid from './isPasswordValid.js';
 import getToken from './getToken.js';
+import isGuest from './isGuest.js';
 
 export default {
   isAuth,
@@ -26,4 +27,5 @@ export default {
   isLoginValid,
   isPasswordValid,
   getToken,
+  isGuest,
 };
