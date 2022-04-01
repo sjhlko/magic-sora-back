@@ -46,6 +46,13 @@ const sendMail = async (transporter, user, link) => {
     to: user.user_email,
     subject: '🔮 마법의 익명고동 비밀번호 재설정',
     html: data,
+    attachments: [
+      {
+        filename: 'soraLogo.png',
+        path: `${__dirname}/soraLogo.png`,
+        cid: 'magicsora_logo',
+      },
+    ],
   });
 };
 
