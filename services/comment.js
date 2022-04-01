@@ -23,7 +23,7 @@ export class CommentService{
     let comments = bestComments.concat(restComments);
     comments = await Promise.all(comments);
     return {
-      isVoted: true,
+      isVisible: true,
       comments
     };
   }
@@ -41,9 +41,6 @@ export class CommentService{
 
   async deleteComment(user_id, post_id, comment_id){
     await models.LikeByUser.destroy({
-      where: {comment_id: comment_id, post_id: post_id}
-    })
-    await models.LikeByNonUser.destroy({
       where: {comment_id: comment_id, post_id: post_id}
     })
     await models.Comment.destroy({

@@ -7,14 +7,18 @@ const commentServiceInstance = new CommentService();
 const route = Router();
 
 export default app =>{
-  app.use('/posts/:id/comments', (req, res, next)=>{
-     req.post_id =req.params.id; 
-     next()
-    }, route
+  app.use(
+    '/posts/:id/comments',
+    (req, res, next)=>{
+      req.post_id =req.params.id; 
+      next()
+    }
+    , route
   )
 
   route.get(
     '/',
+    middlewares.isGuest,
     middlewares.isAuth,
     middlewares.getCurrentUserId,
     middlewares.isCommentVisible,

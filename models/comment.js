@@ -58,6 +58,7 @@ export class Comment extends Model {
   }
   async getCommentInfo(status){
     const author = await models.User.findById(this.user_id, ['nickname', 'profile_pic_url']);
+    const profile = author? author.profile_pic_url : 'default image';
     const voteNum = await models.VoteByUser.getUserVote({
       user: this.user_id,
       post: this.post_id
@@ -69,7 +70,7 @@ export class Comment extends Model {
       choiceId: choiceId,
       status: status,
       author: author.nickname,
-      profile: author.profile_pic_url,
+      profile: profile,
       registerDate: this.register_date,
       likes: this.number_of_like,
       content: this.comment_content
