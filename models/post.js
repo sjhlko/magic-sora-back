@@ -114,7 +114,7 @@ export class Post extends Model {
           attributes: [],
         },
       ],
-      group: ['VoteByUsers.post_id'],
+      group: ['post_id'],
       order: [
         [sequelize.col('count'), 'DESC'],
         ['post_id', 'DESC'],
