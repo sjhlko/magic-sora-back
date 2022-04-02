@@ -59,7 +59,7 @@ export class UserService {
     await models.InterestedTag.deleteAllTags(id);
     await models.LikeByUser.deleteAllLikes(id);
     await models.VoteByUser.deleteUserVote(id);
-    await user.destroy(id);
+    await user.destroy();
   }
 
   async sendResetPasswordEmail(user) {
@@ -69,7 +69,6 @@ export class UserService {
     const link = `${config.clientURL}/reset-password?code=${resetToken}&id=${user.user_id}`;
 
     await sendMail(transporter, user, link);
-    return resetToken;
   }
 
   async resetPassword(user, resetToken, newPassword) {
@@ -91,10 +90,11 @@ export class UserService {
     const user = await models.User.findById(id, ['user_id', 'nickname']);
     let userPosts = await user.getMyPosts();
 
-    userPosts = userPosts.map(async post => {
-      return post.getPostInfo(user.nickname);
-    });
-    userPosts = await Promise.all(userPosts);
+    userPosts = await Promise.all(
+      userPosts.map(async post => {
+        return post.getPostInfo(user.nickname);
+      }),
+    );
 
     return userPosts;
   }
@@ -108,21 +108,19 @@ export class UserService {
     );
     let votePosts = user.Posts;
 
-    votePosts = votePosts.map(async post => {
-      const author = await models.User.findById(post.user_id, ['nickname']);
-      const authorName = author ? author.nickname : '알 수 없음';
-      return post.getPostInfo(authorName);
-    });
-    votePosts = await Promise.all(votePosts);
+    votePosts = await Promise.all(
+      votePosts.map(async post => {
+        const author = await models.User.findById(post.user_id, ['nickname']);
+        const authorName = author ? author.nickname : '알 수 없음';
+        return post.getPostInfo(authorName);
+      }),
+    );
 
     return votePosts;
   }
 
   async getUserTag(id) {
-    const user = await models.User.findWithModel(id, models.Tag, [
-      'tag_id',
-      'tag_name',
-    ]);
+    const user = await models.User.findWithModel(id, models.Tag);
 
     return user.Tags;
   }
@@ -132,10 +130,11 @@ export class UserService {
 
     await models.InterestedTag.deleteAllTags(userId);
 
-    let newTags = newTagIds.map(async id => {
-      return await models.Tag.findById(id.tag_id);
-    });
-    newTags = await Promise.all(newTags);
+    const newTags = await Promise.all(
+      newTagIds.map(async id => {
+        return await models.Tag.findById(id.tag_id);
+      }),
+    );
 
     await user.addTags(newTags);
     return newTags;
