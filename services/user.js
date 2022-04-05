@@ -64,7 +64,7 @@ export class UserService {
 
   async sendResetPasswordEmail(user) {
     const transporter = await createTransporter();
-    const secret = user.password + '_' + new Date().getDate();
+    const secret = `${user.password}_${new Date().getDate()}`;
     const resetToken = await generateToken({ id: user.user_id }, secret);
     const link = `${config.clientURL}/reset-password?code=${resetToken}&id=${user.user_id}`;
 
@@ -72,7 +72,7 @@ export class UserService {
   }
 
   async resetPassword(user, resetToken, newPassword) {
-    const secret = user.password + '_' + new Date().getDate();
+    const secret = `${user.password}_${new Date().getDate()}`;
     const decoded = verifyToken(resetToken, secret);
 
     if (decoded.id != user.user_id) {
