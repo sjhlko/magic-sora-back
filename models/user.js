@@ -59,7 +59,6 @@ export class User extends Model {
       where: { user_id: id },
     });
     await user.update(newUser);
-    return user;
   }
 
   static async findWithModel(id, model, attributes, order) {

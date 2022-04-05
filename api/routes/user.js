@@ -55,9 +55,9 @@ export default app => {
     middlewares.isEmailValid,
     wrapAsyncError(async (req, res) => {
       const user = req.user;
-      const resetToken = await userServiceInstance.sendResetPasswordEmail(user);
+      await userServiceInstance.sendResetPasswordEmail(user);
 
-      return res.json({ id: user.user_id, code: resetToken });
+      return res.sendStatus(200);
     }),
   );
 
