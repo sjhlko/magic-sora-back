@@ -16,4 +16,5 @@ const isCommentVisible = wrapAsyncError(async (req, res, next) => {
     next();
   res.send({ isVisible: false });
 });
+
 export default isCommentVisible;
