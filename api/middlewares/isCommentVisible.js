@@ -14,7 +14,7 @@ const isCommentVisible = wrapAsyncError(async (req, res, next) => {
     new Date(post.finish_date) < new Date()
   )
     next();
-  res.send({ isVisible: false });
+  else next('route');
 });
 
 export default isCommentVisible;

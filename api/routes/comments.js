@@ -28,6 +28,10 @@ export default app => {
     }),
   );
 
+  route.get('/', async (req, res) => {
+    res.json({ isVisible: false });
+  });
+
   route.post(
     '/',
     middlewares.isAuth,
