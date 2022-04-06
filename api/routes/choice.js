@@ -21,17 +21,17 @@ export default app => {
    */
   route.get(
     '/',
+    middlewares.isPostIdValid,
     middlewares.isGuest,
     middlewares.isAuth,
     middlewares.getCurrentUserId,
-    middlewares.isPostIdValid,
-    wrapAsyncError(async (req, res, next) => {
+    wrapAsyncError(async (req, res) => {
       const userId = req.user_id;
       const postId = req.post_id;
       const { choices, isVoted, myVote } =
         await ChoiceServiceInstance.getPostChoices(postId, userId);
 
-      res.json({ isVoted: isVoted, myVote: myVote, choices: choices });
+      res.json({ isVoted, myVote, choices });
     }),
   );
 
@@ -46,14 +46,14 @@ export default app => {
       postId,
     );
 
-    res.json({ isVoted: isVoted, choices: choices });
+    res.json({ isVoted, choices });
   });
 
   route.post(
     '/',
+    middlewares.isPostIdValid,
     middlewares.isAuth,
     middlewares.getCurrentUserId,
-    middlewares.isPostIdValid,
     wrapAsyncError(async (req, res) => {
       const userId = req.user_id;
       const postId = req.post_id;
