@@ -61,6 +61,7 @@ export class Comment extends Model {
       'nickname',
       'profile_pic_url',
     ]);
+    const authorName = author ? author.nickname : '알 수 없음';
     const profile = author ? author.profile_pic_url : 'default image';
     const voteNum = await models.VoteByUser.getUserVote({
       userId: this.user_id,
@@ -72,7 +73,7 @@ export class Comment extends Model {
       id: this.comment_id,
       choiceId: choiceId,
       status: status,
-      author: author.nickname,
+      author: authorName,
       profile: profile,
       registerDate: this.register_date,
       likes: this.number_of_like,
