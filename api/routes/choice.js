@@ -40,14 +40,17 @@ export default app => {
    * isGuest에서 next('route')로 넘어옴
    * 전체 선택지 목록만 응답으로 전송
    */
-  route.get('/', async (req, res) => {
-    const postId = req.post_id;
-    const { choices, isVoted } = await ChoiceServiceInstance.getPostChoices(
-      postId,
-    );
+  route.get(
+    '/',
+    wrapAsyncError(async (req, res) => {
+      const postId = req.post_id;
+      const { choices, isVoted } = await ChoiceServiceInstance.getPostChoices(
+        postId,
+      );
 
-    res.json({ isVoted, choices });
-  });
+      res.json({ isVoted, choices });
+    }),
+  );
 
   route.post(
     '/',
