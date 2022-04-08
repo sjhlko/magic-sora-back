@@ -25,10 +25,7 @@ export class CommentService {
 
     let comments = bestComments.concat(restComments);
     comments = await Promise.all(comments);
-    return {
-      isVisible: true,
-      comments,
-    };
+    return { comments };
   }
 
   async insertComment(post_id, user_id, data) {
@@ -93,5 +90,15 @@ export class CommentService {
       //comment 테이블 like수 업데이트(-1)
       await models.Comment.deleteLikes(comment_id);
     }
+  }
+  async getMyLikes(post_id, user_id) {
+    const likes = await models.LikeByUser.findAll({
+      where: {
+        post_id: post_id,
+        user_id: user_id,
+      },
+    });
+
+    return likes;
   }
 }
