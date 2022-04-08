@@ -159,15 +159,6 @@ export class Post extends Model {
       return tag.tag_name;
     });
 
-    let choices = await this.getChoices();
-    choices.map(choice => {
-      return {
-        id: choice.choice_id,
-        choice_content: choice.choice_content,
-        photo_url: choice.photo_url,
-      };
-    });
-
     let isFinished = new Date(this.finish_date) < new Date();
 
     return {
@@ -179,7 +170,6 @@ export class Post extends Model {
       finishDate: this.finish_date,
       author: authorName,
       tags: tags,
-      choice: choices,
       isFinished: isFinished,
     };
   }

@@ -113,12 +113,8 @@ export class PostService {
     const getPostId = await models.Post.getLatestPost();
     let post_id = getPostId.post_id;
 
-    let tagArray = new Array();
-    if (Array.isArray(data.tag)) tagArray = data.tag;
-    else tagArray.push(data.tag);
-
     //TagOfPost에 post와 관련된 tag 등록
-    tagArray.forEach(async item => {
+    data.tag.forEach(async item => {
       await models.TagOfPost.create({
         post_id: post_id,
         tag_id: item,

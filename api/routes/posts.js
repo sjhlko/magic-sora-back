@@ -1,13 +1,10 @@
 import { Router } from 'express';
 import { PostService } from '../../services/posts.js';
 import { wrapAsyncError } from '../../library/index.js';
-import multer from 'multer';
-import path from 'path';
 import express from 'express';
 import middlewares from '../middlewares/index.js';
 const postServiceInstance = new PostService();
 const route = Router();
-const __dirname = path.resolve();
 
 export default app => {
   app.use('/posts', route);
@@ -45,7 +42,7 @@ export default app => {
     wrapAsyncError(async (req, res) => {
       const post_id = req.params.id;
       await postServiceInstance.deletePost(post_id);
-      return res.sendStatus(200);
+      return res.sendStatus(204);
     }),
   );
 
@@ -62,14 +59,15 @@ export default app => {
   );
 
   //게시판 상세 내용
-  route.use(express.static(__dirname + '/public/images'));
-  route.get('/:id', async (req, res) => {
-    console.log('dfdfdf');
-    const post_id = req.params.id;
-    const postDetail = await postServiceInstance.getPostDetail(post_id);
-    console.log(JSON.stringify(postDetail));
-    res.json(postDetail);
-  });
+  route.get(
+    '/:id',
+    middlewares.isPostIdValid,
+    wrapAsyncError(async (req, res) => {
+      const post_id = req.params.id;
+      const postDetail = await postServiceInstance.getPostDetail(post_id);
+      res.json(postDetail);
+    }),
+  );
 
   //게시판 글쓰기
   route.post(
@@ -80,7 +78,7 @@ export default app => {
       const data = req.body;
       const user = req.user_id;
       await postServiceInstance.insertPost(data, user);
-      return res.sendStatus(200);
+      return res.sendStatus(201);
     }),
   );
 };
