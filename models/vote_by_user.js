@@ -23,15 +23,15 @@ export class VoteByUser extends Model {
     });
   }
 
-  static async getUserVote(id) {
+  static async getUserVote({ userId, postId }) {
     return await this.findOne({
-      where: [{ user_id: id.user }, { post_id: id.post }],
+      where: [{ user_id: userId }, { post_id: postId }],
     });
   }
 
-  static async getChoiceScore(id) {
+  static async getChoiceScore({ postId, choiceId }) {
     return await this.findAll({
-      where: [{ post_id: id.post }, { choice_id: id.choice }],
+      where: [{ post_id: postId }, { choice_id: choiceId }],
     });
   }
 }
