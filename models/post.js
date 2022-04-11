@@ -115,6 +115,7 @@ export class Post extends Model {
         },
       ],
       group: ['post_id'],
+      having: { count: { [Op.gt]: 0 } },
       order: [
         [sequelize.col('count'), 'DESC'],
         ['post_id', 'DESC'],
@@ -126,6 +127,7 @@ export class Post extends Model {
     let tags = await this.getTags({
       attributes: ['tag_name'],
     });
+
     tags = tags.map(tag => {
       return tag.tag_name;
     });
