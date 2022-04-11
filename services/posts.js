@@ -124,11 +124,12 @@ export class PostService {
     //Choice에 post와 관련된 choice 등록
     //choice 배열 객체로 보내줘
     data.choice.forEach(async (item, index) => {
+      let photo_url = item.choiceImgURL ? item.choiceImgURL : null;
       await models.Choice.create({
         choice_id: index + 1,
         post_id: post_id,
-        choice_content: item,
-        photo_url: item.photo_url,
+        choice_content: item.choiceText,
+        photo_url: photo_url,
       });
     });
   }
