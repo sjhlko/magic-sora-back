@@ -119,9 +119,8 @@ export default app => {
     middlewares.getCurrentUserId,
     wrapAsyncError(async (req, res) => {
       const id = req.user_id;
-      const tagIds = req.body;
-
-      const userTags = await userServiceInstance.updateUserTag(id, tagIds);
+      const { newTags } = req.body;
+      const userTags = await userServiceInstance.updateUserTag(id, newTags);
 
       return res.json(userTags);
     }),
