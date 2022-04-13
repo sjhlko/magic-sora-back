@@ -17,42 +17,31 @@ export class AuthService {
     ];
   }
 
-  async getUserByEmail(email) {
-    return await models.User.findByEmail(email, this.userAttributes);
-  }
-
-  async getUserByAccessToken(accessToken) {
-    const userID = jwt.decode(accessToken).user_id;
-    return await models.User.findById(userID, this.userAttributes);
-  }
-
-  async updateRefreshToken(userID, refreshToken) {
-    await models.User.updateUser(userID, { refresh_token: refreshToken });
-  }
-
   async localRegister(newUser) {
     return await models.User.createUser(newUser);
   }
 
   async localLogin(userID) {
-    const payload = {
-      user_id: userID,
-    };
     const token = {
-      access: await generateToken(payload),
+      access: await generateToken({
+        user_id: userID,
+      }),
       refresh: refreshToken(),
     };
-    await this.updateRefreshToken(userID, token.refresh);
+    await models.User.updateUser(userID, {
+      refresh_token: token.refresh,
+    });
     return token;
   }
 
   async logout(accessToken) {
     const userID = jwt.decode(accessToken).user_id;
-    await this.updateRefreshToken(userID, null);
+    await models.User.updateUser(userID, { refresh_token: null });
   }
 
   async refreshCheck(accessToken, refreshToken) {
-    const user = await this.getUserByAccessToken(accessToken);
+    const userID = jwt.decode(accessToken).user_id;
+    const user = await models.User.findById(userID, this.userAttributes);
     if (user.refresh_token === null) {
       throw new CustomError('Bad Request', '🔥 Login required', 401);
     }

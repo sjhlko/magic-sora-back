@@ -114,7 +114,8 @@ export class Post extends Model {
           attributes: [],
         },
       ],
-      group: ['VoteByUsers.post_id'],
+      group: ['post_id'],
+      having: { count: { [Op.gt]: 0 } },
       order: [
         [sequelize.col('count'), 'DESC'],
         ['post_id', 'DESC'],
@@ -126,6 +127,7 @@ export class Post extends Model {
     let tags = await this.getTags({
       attributes: ['tag_name'],
     });
+
     tags = tags.map(tag => {
       return tag.tag_name;
     });
@@ -159,15 +161,6 @@ export class Post extends Model {
       return tag.tag_name;
     });
 
-    let choices = await this.getChoices();
-    choices.map(choice => {
-      return {
-        id: choice.choice_id,
-        choice_content: choice.choice_content,
-        photo_url: choice.photo_url,
-      };
-    });
-
     let isFinished = new Date(this.finish_date) < new Date();
 
     return {
@@ -179,7 +172,6 @@ export class Post extends Model {
       finishDate: this.finish_date,
       author: authorName,
       tags: tags,
-      choice: choices,
       isFinished: isFinished,
     };
   }
