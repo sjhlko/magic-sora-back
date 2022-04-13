@@ -2,7 +2,7 @@ import { models } from '../../models/init-models.js';
 import { wrapAsyncError, CustomError } from '../../library/index.js';
 
 const isPostIdValid = wrapAsyncError(async (req, res, next) => {
-  const id = req.post_id;
+  const id = req.post_id || req.params.id;
   const post = await models.Post.getPostById(id);
 
   if (!post) {
