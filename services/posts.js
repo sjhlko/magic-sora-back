@@ -20,6 +20,9 @@ export class PostService {
     } else if (type == 'favtag') {
       const user = await models.User.findById(id, ['user_id']);
       let tags = await user.getTags();
+
+      if (tags.length == 0) tags = await models.Tag.findAll();
+      console.log(tags);
       tags = tags.map(tag => {
         return tag.tag_id;
       });
