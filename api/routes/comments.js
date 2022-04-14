@@ -25,8 +25,7 @@ export default app => {
     middlewares.getCurrentUserId,
     middlewares.isCommentVisible,
     wrapAsyncError(async (req, res) => {
-      const comments = await commentServiceInstance.getAllComments(req.post_id);
-      const myLikes = await commentServiceInstance.getMyLikes(
+      const { comments, myLikes } = await commentServiceInstance.getAllComments(
         req.post_id,
         req.user_id,
       );
