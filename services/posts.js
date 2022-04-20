@@ -22,7 +22,6 @@ export class PostService {
       let tags = await user.getTags();
 
       if (tags.length == 0) tags = await models.Tag.findAll();
-      console.log(tags);
       tags = tags.map(tag => {
         return tag.tag_id;
       });
@@ -50,6 +49,7 @@ export class PostService {
 
   async deletePost(id) {
     await models.VoteByUser.deleteVoteByUser(id);
+    await models.LikeByUser.deleteLikeByUser(id);
     await models.Choice.deleteChoice(id);
     await models.Comment.deleteComment(id);
     await models.TagOfPost.deleteTagOfPost(id);

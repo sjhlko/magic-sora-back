@@ -81,14 +81,14 @@ export class Post extends Model {
     return await this.findAll({
       attributes: ['post_id', 'user_id', 'post_title', 'register_date'],
       where: { finish_date: { [Op.gt]: new Date() } },
-      order: [['post_id', 'DESC']],
+      order: [['finish_date', 'ASC']],
     });
   }
   static async getEndPost() {
     return await this.findAll({
       attributes: ['post_id', 'user_id', 'post_title', 'register_date'],
       where: { finish_date: { [Op.lt]: new Date() } },
-      order: [['post_id', 'DESC']],
+      order: [['finish_date', 'DESC']],
     });
   }
   static async getFavTagPost(post_id) {
