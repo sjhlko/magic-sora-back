@@ -12,6 +12,7 @@ import isLoginValid from './isPasswordValid.js';
 import isPasswordValid from './isPasswordValid.js';
 import getToken from './getToken.js';
 import isGuest from './isGuest.js';
+import isFinished from './isFinished.js';
 
 export default {
   isAuth,
@@ -28,4 +29,5 @@ export default {
   isPasswordValid,
   getToken,
   isGuest,
+  isFinished,
 };
