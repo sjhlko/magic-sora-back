@@ -38,11 +38,11 @@ export default app => {
     '/',
     middlewares.isFinished,
     wrapAsyncError(async (req, res) => {
-      const { comments } = await commentServiceInstance.getAllComments(
+      const { comments, myLikes } = await commentServiceInstance.getAllComments(
         req.post_id,
         0, //로그인 안한 사람 임의 user_id 부여
       );
-      res.json({ isVisible: true, comments });
+      res.json({ isVisible: true, comments, myLikes });
     }),
   );
 
