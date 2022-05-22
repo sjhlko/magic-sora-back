@@ -124,16 +124,17 @@ export class PostService {
       });
     });
     let photo_url = data.imgURLArr;
+    let choice_text = data.choice_text;
     //Choice에 post와 관련된 choice 등록
     //choice 배열 객체로 보내줘
-    data.choice.forEach(async (item, index) => {
+    data.choice_text.forEach(async (item, index) => {
       await models.Choice.create({
         choice_id: index + 1,
         post_id: post_id,
         photo_url: photo_url[index],
-        choice_content: item.choiceText,
-        //photo_url: photo_url,
+        choice_content: item,
       });
     });
   }
 }
+
