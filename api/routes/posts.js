@@ -16,7 +16,6 @@ export default app => {
       let type = req.query.type;
       if (type !== 'favtag') {
         const posts = await postServiceInstance.getPostList(type);
-        console.log(posts);
         res.json(posts);
       } else next();
     }),
