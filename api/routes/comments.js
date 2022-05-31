@@ -25,8 +25,7 @@ export default app => {
     middlewares.getCurrentUserId,
     middlewares.isCommentVisible,
     wrapAsyncError(async (req, res) => {
-      const comments = await commentServiceInstance.getAllComments(req.post_id);
-      const myLikes = await commentServiceInstance.getMyLikes(
+      const { comments, myLikes } = await commentServiceInstance.getAllComments(
         req.post_id,
         req.user_id,
       );
@@ -35,9 +34,17 @@ export default app => {
   );
 
   //로그인 안한 경우
-  route.get('/', async (req, res) => {
-    res.json({ isVisible: false });
-  });
+  route.get(
+    '/',
+    middlewares.isFinished,
+    wrapAsyncError(async (req, res) => {
+      const { comments, myLikes } = await commentServiceInstance.getAllComments(
+        req.post_id,
+        0, //로그인 안한 사람 임의 user_id 부여
+      );
+      res.json({ isVisible: true, comments, myLikes });
+    }),
+  );
 
   route.post(
     '/',

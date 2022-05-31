@@ -20,6 +20,8 @@ export class PostService {
     } else if (type == 'favtag') {
       const user = await models.User.findById(id, ['user_id']);
       let tags = await user.getTags();
+
+      if (tags.length == 0) tags = await models.Tag.findAll();
       tags = tags.map(tag => {
         return tag.tag_id;
       });
@@ -47,6 +49,7 @@ export class PostService {
 
   async deletePost(id) {
     await models.VoteByUser.deleteVoteByUser(id);
+    await models.LikeByUser.deleteLikeByUser(id);
     await models.Choice.deleteChoice(id);
     await models.Comment.deleteComment(id);
     await models.TagOfPost.deleteTagOfPost(id);
@@ -120,17 +123,18 @@ export class PostService {
         tag_id: item,
       });
     });
-
+    let photo_url = data.imgURLArr;
+    let choice_text = data.choice_text;
     //Choice에 post와 관련된 choice 등록
     //choice 배열 객체로 보내줘
-    data.choice.forEach(async (item, index) => {
-      let photo_url = item.choiceImgURL ? item.choiceImgURL : null;
+    data.choice_text.forEach(async (item, index) => {
       await models.Choice.create({
         choice_id: index + 1,
         post_id: post_id,
-        choice_content: item.choiceText,
-        photo_url: photo_url,
+        photo_url: photo_url[index],
+        choice_content: item,
       });
     });
   }
 }
+

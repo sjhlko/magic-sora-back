@@ -16,6 +16,11 @@ export class LikeByUser extends Model {
       },
     });
   }
+  static async deleteLikeByUser(id) {
+    await this.destroy({
+      where: { post_id: id },
+    });
+  }
 }
 
 LikeByUser.init(
