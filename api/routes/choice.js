@@ -15,10 +15,6 @@ export default app => {
     route,
   );
 
-  /**
-   * 로그인 한 상태
-   * 전체 선택지 목록 + 투표한 선택지 번호 응답으로 전송
-   */
   route.get(
     '/',
     middlewares.isPostIdValid,
@@ -35,11 +31,6 @@ export default app => {
     }),
   );
 
-  /**
-   * 로그인 안 한 상태
-   * isGuest에서 next('route')로 넘어옴
-   * 전체 선택지 목록만 응답으로 전송
-   */
   route.get(
     '/',
     wrapAsyncError(async (req, res) => {

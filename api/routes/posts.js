@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { PostService } from '../../services/posts.js';
 import { wrapAsyncError } from '../../library/index.js';
-import express from 'express';
 import middlewares from '../middlewares/index.js';
 const postServiceInstance = new PostService();
 const route = Router();
@@ -9,7 +8,6 @@ const route = Router();
 export default app => {
   app.use('/posts', route);
 
-  //hot, new, end, deadline
   route.get(
     '/',
     wrapAsyncError(async (req, res, next) => {
@@ -21,7 +19,6 @@ export default app => {
     }),
   );
 
-  //favtag
   route.get(
     '/',
     middlewares.isAuth,
@@ -34,7 +31,6 @@ export default app => {
     }),
   );
 
-  //게시판 삭제
   route.delete(
     '/:id',
     middlewares.isAuth,
@@ -46,19 +42,16 @@ export default app => {
     }),
   );
 
-  //게시판 검색
   route.get(
     '/search',
     wrapAsyncError(async (req, res) => {
       let option = req.query.option;
       let search = req.query.search;
-      // /search? option = 옵션 & search = 검색내용
       const posts = await postServiceInstance.searchPost(option, search);
       res.json(posts);
     }),
   );
 
-  //게시판 상세 내용
   route.get(
     '/:id',
     middlewares.isPostIdValid,
@@ -69,7 +62,6 @@ export default app => {
     }),
   );
 
-  //게시판 글쓰기
   route.post(
     '/',
     middlewares.isAuth,

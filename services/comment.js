@@ -1,10 +1,4 @@
-import config from '../config/index.js';
 import { models } from '../models/init-models.js';
-import {
-  createTransporter,
-  hashPassword,
-  CustomError,
-} from '../library/index.js';
 
 export class CommentService {
   async getAllComments(post_id, user_id) {
@@ -62,11 +56,9 @@ export class CommentService {
       comment_id: comment_id,
     });
 
-    //comment 테이블 like수 업데이트(+1)
     await models.Comment.addLikes(comment_id);
   }
   async deleteLikes(user_id, post_id, comment_id) {
-    //like_by_user 테이블 행 삭제
     await models.LikeByUser.destroy({
       where: {
         user_id: user_id,
@@ -74,7 +66,6 @@ export class CommentService {
         comment_id: comment_id,
       },
     });
-    //comment 테이블 like수 업데이트(-1)
     await models.Comment.deleteLikes(comment_id);
   }
 }

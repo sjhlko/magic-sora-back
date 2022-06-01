@@ -1,10 +1,4 @@
-import config from '../config/index.js';
 import { models } from '../models/init-models.js';
-import {
-  createTransporter,
-  hashPassword,
-  CustomError,
-} from '../library/index.js';
 
 export class PostService {
   async getPostList(type, id) {
@@ -112,11 +106,9 @@ export class PostService {
       register_date: register_date,
       finish_date: data.finish_date,
     });
-    //게시글 등록 시 post_id를 구하는 쿼리
     const getPostId = await models.Post.getLatestPost();
     let post_id = getPostId.post_id;
 
-    //TagOfPost에 post와 관련된 tag 등록
     data.tag.forEach(async item => {
       await models.TagOfPost.create({
         post_id: post_id,
@@ -125,9 +117,7 @@ export class PostService {
     });
     let photo_url = data.imgURLArr;
     let choice_text = data.choice_text;
-    //Choice에 post와 관련된 choice 등록
-    //choice 배열 객체로 보내줘
-    data.choice_text.forEach(async (item, index) => {
+    choice_text.forEach(async (item, index) => {
       await models.Choice.create({
         choice_id: index + 1,
         post_id: post_id,
@@ -137,4 +127,3 @@ export class PostService {
     });
   }
 }
-
