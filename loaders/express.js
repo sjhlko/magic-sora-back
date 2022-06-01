@@ -1,0 +1,21 @@
+import express from 'express';
+import morgan from 'morgan';
+import route from '../api/index.js';
+import config from '../config/index.js';
+import logger from './logger.js';
+import cookieParser from 'cookie-parser';
+import nocache from 'nocache';
+
+export default app => {
+  const combined =
+    ':remote-addr - :remote-user ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"';
+  const morganFormat = process.env.NODE_ENV !== 'production' ? 'dev' : combined;
+
+  app.use(cookieParser());
+  app.set('etag', false);
+  app.use(nocache());
+  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json());
+  app.use(morgan(morganFormat, { stream: logger.stream }));
+  app.use(config.api.prefix, route());
+};
