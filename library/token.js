@@ -3,7 +3,7 @@ import config from '../config/index.js';
 
 export function generateToken(payload, secret, expireTime) {
   const jwtSecret = secret || config.jwtSecret;
-  const expireIn = expireTime || '600s';
+  const expireIn = expireTime || '3600s';
 
   return new Promise((resolve, reject) => {
     jwt.sign(

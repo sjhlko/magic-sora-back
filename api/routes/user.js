@@ -8,7 +8,6 @@ const userServiceInstance = new UserService();
 export default app => {
   app.use('/users', route);
 
-  // 프로필 정보 조회
   route.get(
     '/',
     middlewares.isAuth,
@@ -21,7 +20,6 @@ export default app => {
     }),
   );
 
-  // 프로필 정보 수정
   route.patch(
     '/',
     middlewares.isAuth,
@@ -36,7 +34,6 @@ export default app => {
     }),
   );
 
-  // 회원 탈퇴
   route.delete(
     '/',
     middlewares.isAuth,
@@ -49,7 +46,6 @@ export default app => {
     }),
   );
 
-  // 비밀번호 재설정 및 재설정 메일 전송
   route.post(
     '/reset-password',
     middlewares.isEmailValid,
@@ -73,7 +69,6 @@ export default app => {
     }),
   );
 
-  // 작성한 고민 조회
   route.get(
     '/myposts',
     middlewares.isAuth,
@@ -86,7 +81,6 @@ export default app => {
     }),
   );
 
-  // 투표한 고민 조회
   route.get(
     '/myvotes',
     middlewares.isAuth,
@@ -99,7 +93,6 @@ export default app => {
     }),
   );
 
-  // 관심태그 조회
   route.get(
     '/mytags',
     middlewares.isAuth,
@@ -112,7 +105,6 @@ export default app => {
     }),
   );
 
-  // 관심태그 목록 수정
   route.patch(
     '/mytags',
     middlewares.isAuth,
@@ -126,7 +118,6 @@ export default app => {
     }),
   );
 
-  // email, 닉네임 중복 조회
   route.get(
     '/nickname-exists',
     middlewares.isNicknameExists,

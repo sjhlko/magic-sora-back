@@ -67,7 +67,7 @@ export class Comment extends Model {
       userId: this.user_id,
       postId: this.post_id,
     });
-    //DB에 투표안한사람들도 댓글 쓴 경우가 있어서 일단 임시방편
+
     let choiceId = voteNum ? voteNum.choice_id : 0;
     return {
       id: this.comment_id,

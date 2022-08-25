@@ -9,7 +9,6 @@ const route = Router();
 export default app => {
   app.use('/auth', route);
 
-  //로컬 회원가입
   route.post(
     '/register/local',
     wrapAsyncError(async (req, res) => {
@@ -18,7 +17,6 @@ export default app => {
     }),
   );
 
-  //로컬 로그인
   route.post(
     '/login/local',
     middlewares.isEmailValid,
@@ -38,7 +36,6 @@ export default app => {
     }),
   );
 
-  //로그아웃
   route.post(
     '/logout',
     middlewares.getToken,
@@ -49,7 +46,6 @@ export default app => {
     }),
   );
 
-  //access token이 만료되어 refresh토큰을 비교함
   route.get(
     '/refresh',
     middlewares.getToken,

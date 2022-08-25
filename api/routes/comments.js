@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { CommentService } from '../../services/comment.js';
 import { wrapAsyncError } from '../../library/index.js';
-import express from 'express';
 import middlewares from '../middlewares/index.js';
 const commentServiceInstance = new CommentService();
 const route = Router();
@@ -16,7 +15,6 @@ export default app => {
     route,
   );
 
-  //로그인 한 경우
   route.get(
     '/',
     middlewares.isPostIdValid,
@@ -33,14 +31,13 @@ export default app => {
     }),
   );
 
-  //로그인 안한 경우
   route.get(
     '/',
     middlewares.isFinished,
     wrapAsyncError(async (req, res) => {
       const { comments, myLikes } = await commentServiceInstance.getAllComments(
         req.post_id,
-        0, //로그인 안한 사람 임의 user_id 부여
+        0,
       );
       res.json({ isVisible: true, comments, myLikes });
     }),
